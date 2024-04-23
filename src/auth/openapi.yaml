@@ -1,0 +1,64 @@
+openapi: 3.0.3
+info:
+  version: 1.0.0
+  title: Uber Authentication
+  description: Uber’s login endpoint.
+
+servers:
+  - url: https://login.uber.com/
+
+components:
+  schemas:
+    LoginReq:
+      type: object
+      properties:
+        client_id:
+          type: string
+          description: Your application client ID
+        client_secret:
+          type: string
+          description: Your application client secret
+        grant_type:
+          type: string
+          enum:
+            - client_credentials
+        scope:
+          type: string
+          description: A space-separated list of scopes
+          example: eats.deliveries direct.organizations
+    LoginResp:
+      type: object
+      properties:
+        access_token:
+          type: string
+          description: Used to make authenticated calls to the API
+        token_type:
+          type: string
+          description: Should be Bearer
+        expires_in:
+          type: number
+          description: Number of seconds that the access token is valid
+        scope:
+          type: string
+          description: Should match the scopes you passed in
+
+
+paths:
+  /oauth/v2/token:
+    post:
+      tags: [Access Token]
+      summary: Login
+      description: Get a valid access token.
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/LoginReq'
+      responses:
+        "200":
+          description: Successfully fetched an access token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResp'
