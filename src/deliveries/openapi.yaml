@@ -1,0 +1,3391 @@
+openapi: 3.0.3
+info:
+  title: Direct API
+  description: |
+    # Table of contents
+    - [Create Quote](#tag/Quotes/paths/~1customers~1{customer_id}~1delivery_quotes/post)
+    - [Create Delivery](#tag/Delivery/paths/~1customers~1{customer_id}~1deliveries/post)
+    - [List Deliveries](#tag/Delivery/paths/~1customers~1{customer_id}~1deliveries/get)
+    - [Update Delivery](#tag/Delivery/paths/~1customers~1{customer_id}~1deliveries~1{delivery_id}/post)
+    - [Get Delivery](#tag/Delivery/paths/~1customers~1{customer_id}~1deliveries~1{delivery_id}/get)
+    - [Cancel Delivery](#tag/Delivery/paths/~1customers~1{customer_id}~1deliveries~1{delivery_id}~1cancel/post)
+    - [Proof of Delivery](#tag/Delivery/paths/~1customers~1{customer_id}~1deliveries~1{delivery_id}~1proof-of-delivery/post)
+  version: 1.0.1
+servers:
+  - url: https://api.uber.com/v1
+security:
+  - direct_auth:
+      - eats.deliveries
+paths:
+  /customers/{customer_id}/delivery_quotes:
+    post:
+      tags:
+        - Quotes
+      summary: Create Quote
+      description: "Create a quote to check deliverability, validity and cost for\
+        \ delivery between two addresses."
+      parameters:
+        - name: customer_id
+          in: path
+          description: Unique identifier for the organization. Either UUID or starts
+            with `cus_`.
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+          example: a11e6f29-6850-4d8d-b88d-0ae69cec1111
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeliveryQuoteReq'
+        required: true
+      x-codeSamples:
+        - lang: 'Python'
+          label: 'Python'
+          source:
+            $ref: '#/components/codeSamples/quotePython'
+        - lang: 'JavaScript'
+          label: 'JavaScript'
+          source:
+            $ref: '#/components/codeSamples/quoteJavaScript'
+        - lang: 'cURL'
+          label: 'cURL'
+          source:
+            $ref: '#/components/codeSamples/quoteCurl'
+      responses:
+        '200':
+          description: Successfully created a delivery quote
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeliveryQuoteResp'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                address_undeliverable:
+                  $ref: '#/components/examples/address_undeliverable'
+                invalid_params:
+                  $ref: '#/components/examples/invalid_params'
+                unknown_location:
+                  $ref: '#/components/examples/unknown_location'
+                pickup_window_too_small:
+                  $ref: '#/components/examples/pickup_window_too_small'
+                dropoff_deadline_too_early:
+                  $ref: '#/components/examples/dropoff_deadline_too_early'
+                dropoff_deadline_before_pickup_deadline:
+                  $ref: '#/components/examples/dropoff_deadline_before_pickup_deadline'
+                dropoff_ready_after_pickup_deadline:
+                  $ref: '#/components/examples/dropoff_ready_after_pickup_deadline'
+                pickup_ready_too_early:
+                  $ref: '#/components/examples/pickup_ready_too_early'
+                pickup_deadline_too_early:
+                  $ref: '#/components/examples/pickup_deadline_too_early'
+                pickup_ready_too_late:
+                  $ref: '#/components/examples/pickup_ready_too_late'
+                address_undeliverable_limited_couriers:
+                  $ref: '#/components/examples/address_undeliverable_limited_couriers'
+                customer_limited:
+                  $ref: '#/components/examples/customer_limited'
+                not_allowed:
+                  $ref: '#/components/examples/not_allowed'
+        '401':
+          description: unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/401Error'
+              examples:
+                unauthorized:
+                  $ref: '#/components/examples/unauthorized'
+        '402':
+          description: customer_suspended
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                customer_suspended:
+                  $ref: '#/components/examples/customer_suspended'
+        '403':
+          description: customer_blocked
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                customer_blocked:
+                  $ref: '#/components/examples/customer_blocked'
+        '404':
+          description: customer_not_found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                customer_not_found:
+                  $ref: '#/components/examples/customer_not_found'
+        '408':
+          description: request_timeout
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                request_timeout:
+                  $ref: '#/components/examples/request_timeout'
+        '429':
+          description: customer_limited
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                customer_limited:
+                  $ref: '#/components/examples/customer_limited'
+        '500':
+          description: internal_server_error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                internal_server_error:
+                  $ref: '#/components/examples/internal_server_error'
+        '503':
+          description: couriers_busy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                couriers_busy:
+                  $ref: '#/components/examples/couriers_busy'
+                robo_couriers_busy:
+                  $ref: '#/components/examples/robo_couriers_busy'
+                service_unavailable:
+                  $ref: '#/components/examples/service_unavailable'
+      security:
+        - direct_auth:
+            - eats.deliveries
+  /customers/{customer_id}/deliveries:
+    post:
+      tags:
+        - Delivery
+      summary: Create Delivery
+      description: Create a delivery between two addresses.
+      parameters:
+        - name: customer_id
+          in: path
+          description: Unique identifier for the organization. Either UUID or starts
+            with `cus_`.
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+          example: a11e6f29-6850-4d8d-b88d-0ae69cec1111
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeliveryReq'
+        required: true
+      x-codeSamples:
+        - lang: 'Python'
+          label: 'Python'
+          source:
+            $ref: '#/components/codeSamples/deliveryPython'
+        - lang: 'JavaScript'
+          label: 'JavaScript'
+          source:
+            $ref: '#/components/codeSamples/deliveryJavaScript'
+        - lang: 'cURL'
+          label: 'cURL'
+          source:
+            $ref: '#/components/codeSamples/deliveryCurl'
+      responses:
+        '200':
+          description: Successfully created a delivery quote
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateDeliveryResp'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorWithMetadata'
+              examples:
+                address_undeliverable:
+                  $ref: '#/components/examples/address_undeliverable'
+                invalid_params:
+                  $ref: '#/components/examples/invalid_params'
+                invalid_params (fields cannot be updated):
+                  $ref: '#/components/examples/invalid_params_fields_cannot_be_updated'
+                invalid_params (cannot determine pickup address):
+                  $ref: '#/components/examples/invalid_params_cannot_determine_pickup_address'
+                invalid_params (dropoff phone number is not valid):
+                  $ref: '#/components/examples/invalid_params_dropoff_phone_number_is_not_valid'
+                invalid_params (dropoff ready time needs 10 mins from now):
+                  $ref: '#/components/examples/invalid_params_dropoff_ready_time_needs_10_mins_from_now'
+                invalid_params (address geocoding failed):
+                  $ref: '#/components/examples/invalid_params_address_geocoding_failed'
+                invalid_params (Long/Lat too far):
+                  $ref: '#/components/examples/invalid_params_long_lat_too_far'
+                invalid_params (invalid restaurant gateway):
+                  $ref: '#/components/examples/invalid_params_invalid_restaurant_gateway'
+                invalid_params (pickup phone number is not valid):
+                  $ref: '#/components/examples/invalid_params_pickup_phone_number_is_not_valid'
+                invalid_params (no geocoding result found):
+                  $ref: '#/components/examples/invalid_params_no_geocoding_result_found'
+                invalid_params (invalid pickup location):
+                  $ref: '#/components/examples/invalid_params_invalid_pickup_location'
+                invalid_params (address is required):
+                  $ref: '#/components/examples/invalid_params_address_is_required'
+                invalid_params (delivery location changed):
+                  $ref: '#/components/examples/invalid_params_delivery_location_changed'
+                invalid_params (dropoff ready time needs 29 mins from now):
+                  $ref: '#/components/examples/invalid_params_dropoff_ready_time_needs_29_mins_from_now'
+                unknown_location:
+                  $ref: '#/components/examples/unknown_location'
+                pickup_window_too_small:
+                  $ref: '#/components/examples/pickup_window_too_small'
+                dropoff_deadline_too_early:
+                  $ref: '#/components/examples/dropoff_deadline_too_early'
+                dropoff_deadline_before_pickup_deadline:
+                  $ref: '#/components/examples/dropoff_deadline_before_pickup_deadline'
+                dropoff_ready_after_pickup_deadline:
+                  $ref: '#/components/examples/dropoff_ready_after_pickup_deadline'
+                pickup_ready_too_early:
+                  $ref: '#/components/examples/pickup_ready_too_early'
+                pickup_deadline_too_early:
+                  $ref: '#/components/examples/pickup_deadline_too_early'
+                pickup_ready_too_late:
+                  $ref: '#/components/examples/pickup_ready_too_late'
+                request_timeout:
+                  $ref: '#/components/examples/request_timeout'
+                address_undeliverable_limited_couriers:
+                  $ref: '#/components/examples/address_undeliverable_limited_couriers'
+                expired_quote:
+                  $ref: '#/components/examples/expired_quote'
+                used_quote:
+                  $ref: '#/components/examples/used_quote'
+                missing_payment:
+                  $ref: '#/components/examples/missing_payment'
+                not_allowed:
+                  $ref: '#/components/examples/not_allowed'
+                mismatched_price_quote:
+                  $ref: '#/components/examples/mismatched_price_quote'
+        '401':
+          description: unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/401Error'
+              examples:
+                unauthorized:
+                  $ref: '#/components/examples/unauthorized'
+        '402':
+          description: customer_suspended
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                customer_suspended:
+                  $ref: '#/components/examples/customer_suspended'
+        '403':
+          description: customer_blocked
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                customer_blocked:
+                  $ref: '#/components/examples/customer_blocked'
+        '404':
+          description: customer_not_found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                customer_not_found:
+                  $ref: '#/components/examples/customer_not_found'
+        '409':
+          description: duplicate_delivery
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorWithMetadata'
+              examples:
+                duplicate_delivery:
+                  $ref: '#/components/examples/duplicate_delivery'
+        '429':
+          description: customer_limited
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                customer_limited:
+                  $ref: '#/components/examples/customer_limited'
+        '500':
+          description: internal_server_error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                internal_server_error:
+                  $ref: '#/components/examples/internal_server_error'
+        '503':
+          description: couriers_busy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                couriers_busy:
+                  $ref: '#/components/examples/couriers_busy'
+                robo_couriers_busy:
+                  $ref: '#/components/examples/robo_couriers_busy'
+                service_unavailable:
+                  $ref: '#/components/examples/service_unavailable'
+      security:
+        - direct_auth:
+            - eats.deliveries
+    get:
+      tags:
+        - Delivery
+      summary: List Deliveries
+      description: List all deliveries associated with the given `customerId`
+      parameters:
+        - name: customer_id
+          in: path
+          description: Unique identifier for the organization. Either UUID or starts
+            with `cus_`.
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+          example: a11e6f29-6850-4d8d-b88d-0ae69cec1111
+        - name: filter
+          in: query
+          description: 'Filter deliveries by delivery state. Valid values are: “pending”, “pickup”, “pickup_complete”, “dropoff”, “delivered”, “canceled”, “returned”, and “ongoing”.'
+          required: false
+          style: simple
+          explode: false
+          schema:
+            type: string
+        - name: limit
+          in: query
+          description: Maximum number of responses to return.
+          required: false
+          style: simple
+          explode: false
+          schema:
+            type: integer
+        - name: Offset
+          in: query
+          description: Offset of response objects for pagination.
+          required: false
+          style: simple
+          explode: false
+          schema:
+            type: integer
+      x-codeSamples:
+        - lang: 'Python'
+          label: 'Python'
+          source:
+            $ref: '#/components/codeSamples/listDeliveryPython'
+        - lang: 'JavaScript'
+          label: 'JavaScript'
+          source:
+            $ref: '#/components/codeSamples/listDeliveryJavaScript'
+        - lang: 'cURL'
+          label: 'cURL'
+          source:
+            $ref: '#/components/codeSamples/listDeliveryCurl'
+      responses:
+        '200':
+          description: Successfully retrieved deliveries
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200'
+        '400':
+          description: invalid_params
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                invalid_params:
+                  $ref: '#/components/examples/invalid_params'
+        '401':
+          description: unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/401Error'
+              examples:
+                unauthorized:
+                  $ref: '#/components/examples/unauthorized'
+        '404':
+          description: delivery_not_found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                customer_not_found:
+                  $ref: '#/components/examples/customer_not_found'
+        '408':
+          description: request_timeout
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                request_timeout:
+                  $ref: '#/components/examples/request_timeout'
+        '500':
+          description: internal_server_error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                internal_server_error:
+                  $ref: '#/components/examples/internal_server_error'
+        '503':
+          description: service_unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                service_unavailable:
+                  $ref: '#/components/examples/service_unavailable'
+      security:
+        - direct_auth:
+            - eats.deliveries
+  /customers/{customer_id}/deliveries/{delivery_id}:
+    get:
+      tags:
+        - Delivery
+      summary: Get Delivery
+      description: "Get the details of an existing delivery, specified by the `delivery_id`\
+        \ in the URL"
+      parameters:
+        - name: customer_id
+          in: path
+          description: Unique identifier for the organization. Either UUID or starts
+            with `cus_`.
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+          example: a11e6f29-6850-4d8d-b88d-0ae69cec1111
+        - name: delivery_id
+          in: path
+          description: Unique identifier for the delivery. Always starts with del_
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+          example: del_ExLGCyywQ5KlvncU2rUUUd3
+      x-codeSamples:
+        - lang: 'Python'
+          label: 'Python'
+          source:
+            $ref: '#/components/codeSamples/getDeliveryPython'
+        - lang: 'JavaScript'
+          label: 'JavaScript'
+          source:
+            $ref: '#/components/codeSamples/getDeliveryJavaScript'
+        - lang: 'cURL'
+          label: 'cURL'
+          source:
+            $ref: '#/components/codeSamples/getDeliveryCurl'
+      responses:
+        '200':
+          description: Successfully retrieved delivery
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetDeliveryResp'
+        '400':
+          description: invalid_params
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                invalid_params:
+                  $ref: '#/components/examples/invalid_params'
+        '401':
+          description: unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/401Error'
+              examples:
+                unauthorized:
+                  $ref: '#/components/examples/unauthorized'
+        '404':
+          description: delivery_not_found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                delivery_not_found:
+                  $ref: '#/components/examples/delivery_not_found'
+                customer_not_found:
+                  $ref: '#/components/examples/customer_not_found'
+        '408':
+          description: request_timeout
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                request_timeout:
+                  $ref: '#/components/examples/request_timeout'
+        '500':
+          description: internal_server_error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                internal_server_error:
+                  $ref: '#/components/examples/internal_server_error'
+        '503':
+          description: service_unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                service_unavailable:
+                  $ref: '#/components/examples/service_unavailable'
+      security:
+        - direct_auth:
+            - eats.deliveries
+    post:
+      tags:
+        - Delivery
+      summary: Update Delivery
+      description: "Update the details of an existing delivery, specified by the `delivery_id`\
+        \ in the URL. Please refer to the [FAQ](https://developer.uber.com/docs/deliveries/faq#tag/Delivery/paths/~1customers~1%7Bcustomer_id%7D~1deliveries~1%7Bdelivery_id%7D~1proof-of-delivery/post) section for detailed update timings."
+      parameters:
+        - name: customer_id
+          in: path
+          description: Unique identifier for the organization. Either UUID or starts
+            with `cus_`.
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+          example: a11e6f29-6850-4d8d-b88d-0ae69cec1111
+        - name: delivery_id
+          in: path
+          description: Unique identifier for the delivery. Always starts with del_
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+          example: del_ExLGCyywQ5KlvncU2rUUUd3
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateDeliveryReq'
+        required: true
+      x-codeSamples:
+        - lang: 'Python'
+          label: 'Python'
+          source:
+            $ref: '#/components/codeSamples/updateDeliveryPython'
+        - lang: 'JavaScript'
+          label: 'JavaScript'
+          source:
+            $ref: '#/components/codeSamples/updateDeliveryJavaScript'
+        - lang: 'cURL'
+          label: 'cURL'
+          source:
+            $ref: '#/components/codeSamples/updateDeliveryCurl'
+      responses:
+        '200':
+          description: Successfully retrieved delivery.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeliveryResp'
+        '400':
+          description: invalid_params
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                max_tip_exceeded:
+                  $ref: '#/components/examples/max_tip_exceeded'
+                tip_already_recorded:
+                  $ref: '#/components/examples/tip_already_recorded'
+                no_tip:
+                  $ref: '#/components/examples/no_tip'
+                invalid_tipping_state:
+                  $ref: '#/components/examples/invalid_tipping_state'
+        '401':
+          description: unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/401Error'
+              examples:
+                unauthorized:
+                  $ref: '#/components/examples/unauthorized'
+        '404':
+          description: delivery_not_found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                delivery_not_found:
+                  $ref: '#/components/examples/delivery_not_found'
+                customer_not_found:
+                  $ref: '#/components/examples/customer_not_found'
+        '408':
+          description: request_timeout
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: internal_server_error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                internal_server_error:
+                  $ref: '#/components/examples/internal_server_error'
+        '503':
+          description: service_unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      security:
+        - direct_auth:
+            - eats.deliveries
+  /customers/{customer_id}/deliveries/{delivery_id}/cancel:
+    post:
+      tags:
+        - Delivery
+      summary: Cancel Delivery
+      description: Cancel an ongoing or previously scheduled delivery.
+      parameters:
+        - name: customer_id
+          in: path
+          description: Unique identifier for the organization. Either UUID or starts
+            with `cus_`.
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+          example: a11e6f29-6850-4d8d-b88d-0ae69cec1111
+        - name: delivery_id
+          in: path
+          description: Unique identifier for the delivery. Always starts with del_
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+          example: del_ExLGCyywQ5KlvncU2rUUUd3
+      x-codeSamples:
+        - lang: 'Python'
+          label: 'Python'
+          source:
+            $ref: '#/components/codeSamples/cancelDeliveryPython'
+        - lang: 'JavaScript'
+          label: 'JavaScript'
+          source:
+            $ref: '#/components/codeSamples/cancelDeliveryJavaScript'
+        - lang: 'cURL'
+          label: 'cURL'
+          source:
+            $ref: '#/components/codeSamples/cancelDeliveryCurl'
+      responses:
+        '200':
+          description: Returns the canceled delivery.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeliveryResp'
+        '400':
+          description: invalid_params
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                invalid_params:
+                  $ref: '#/components/examples/invalid_params'
+                noncancelable_delivery:
+                  $ref: '#/components/examples/noncancelable_delivery'
+        '401':
+          description: unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/401Error'
+              examples:
+                unauthorized:
+                  $ref: '#/components/examples/unauthorized'
+        '404':
+          description: delivery_not_found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                delivery_not_found:
+                  $ref: '#/components/examples/delivery_not_found'
+                customer_not_found:
+                  $ref: '#/components/examples/customer_not_found'
+        '408':
+          description: request_timeout
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                request_timeout:
+                  $ref: '#/components/examples/request_timeout'
+        '500':
+          description: internal_server_error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                internal_server_error:
+                  $ref: '#/components/examples/internal_server_error'
+                unknown_error:
+                  $ref: '#/components/examples/unknown_error'
+        '503':
+          description: service_unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                service_unavailable:
+                  $ref: '#/components/examples/service_unavailable'
+      security:
+        - direct_auth:
+            - eats.deliveries
+  /customers/{customer_id}/deliveries/{delivery_id}/proof-of-delivery:
+    post:
+      tags:
+        - Delivery
+      summary: Proof of Delivery
+      description: |
+        If a delivery is created with any verification requirements (e.g.: picture, signature or pincode), the resulting image file is made available to you through our proof-of-delivery endpoint. The endpoint will return a Proof-of-Delivery (P.O.D.) File – A long Base64 string that can be converted to a PNG image ([Web Converter](https://codebeautify.org/base64-to-image-converter) (External)).
+
+        The image will include the following information:
+        - Delivery Status
+        - Delivery timestamp
+        - Uber Order ID
+        - External Order ID
+        - Proof Type
+        - Image (Signature image, picture image, or pincode value)
+
+        For the `signature` verification type, signer name or signer relationship will also be included if it is enabled for a delivery.
+      parameters:
+        - name: customer_id
+          in: path
+          description: Unique identifier for the organization. Either UUID or starts
+            with `cus_`.
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+          example: a11e6f29-6850-4d8d-b88d-0ae69cec1111
+        - name: delivery_id
+          in: path
+          description: Unique identifier for the delivery. Always starts with del_
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+          example: del_ExLGCyywQ5KlvncU2rUUUd3
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PODReq'
+        required: true
+      x-codeSamples:
+        - lang: 'Python'
+          label: 'Python'
+          source:
+            $ref: '#/components/codeSamples/podPython'
+        - lang: 'JavaScript'
+          label: 'JavaScript'
+          source:
+            $ref: '#/components/codeSamples/podJavaScript'
+        - lang: 'cURL'
+          label: 'cURL'
+          source:
+            $ref: '#/components/codeSamples/podCurl'
+      responses:
+        '200':
+          description: Returns the proof of delivery information.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PODResp'
+        '400':
+          description: invalid_params
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                invalid_params:
+                  $ref: '#/components/examples/invalid_params'
+        '404':
+          description: delivery_not_found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                delivery_not_found:
+                  $ref: '#/components/examples/delivery_not_found'
+        '408':
+          description: request_timeout
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                request_timeout:
+                  $ref: '#/components/examples/request_timeout'
+        '500':
+          description: internal_server_error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                internal_server_error:
+                  $ref: '#/components/examples/internal_server_error'
+        '503':
+          description: service_unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                service_unavailable:
+                  $ref: '#/components/examples/service_unavailable'
+      security:
+        - direct_auth:
+            - eats.deliveries
+components:
+  schemas:
+    DeliveryQuoteReq:
+      required:
+        - dropoff_address
+        - pickup_address
+      type: object
+      properties:
+        pickup_address:
+          type: string
+          description: |
+            JSON string containing pickup address details.
+
+            **Note:** Please note the escaping of the quotes ( \ " ). This is not the simplest format of expression addresses, however, the benefit comes with the corresponding  parsing and accuracy  when it is received by our booking engine. Please refer to our [FAQ section](https://developer.uber.com/docs/deliveries/faq#what-are-the-address-best-practices?) for more information on how to format addresses.
+          example: '{"street_address":["100 Maiden Ln"],"city":"New York","state":"NY","zip_code":"10023","country":"US"}'
+        dropoff_address:
+          type: string
+          description: |
+            JSON string containing dropoff address details.
+
+            **Note:** Please note the escaping of the quotes ( \ " ). This is not the simplest format of expression addresses, however, the benefit comes with the corresponding  parsing and accuracy  when it is received by our booking engine. Please refer to our [FAQ section](https://developer.uber.com/docs/deliveries/faq#what-are-the-address-best-practices?) for more information on how to format addresses.
+          example: '{"street_address":["30 Lincoln Center Plaza"],"city":"New York","state":"NY","zip_code":"10023","country":"US"}'
+        pickup_latitude:
+          type: number
+          description: Pickup latitude coordinate.
+          example: 40.7066581
+        pickup_longitude:
+          type: number
+          description: Pickup longitude coordinate.
+          example: -74.0071868
+        dropoff_latitude:
+          type: number
+          description: Dropoff latitude coordinate.
+          example: 38.9298375
+        dropoff_longitude:
+          type: number
+          description: Dropoff longitude coordinate.
+          example: -77.0582303
+        pickup_ready_dt:
+          type: string
+          description: (RFC 3339) Beginning of the window when an order must be picked
+            up. Must be less than 30 days in the future.
+          format: timestamp
+          example: 2024-12-12T14:00:00Z
+        pickup_deadline_dt:
+          type: string
+          description: (RFC 3339) End of the window when an order may be picked up.
+            Must be at least 10 mins later than pickup_ready_dt and at least 20 minutes
+            in the future from now.
+          format: timestamp
+          example: 2024-12-12T14:30:00Z
+        dropoff_ready_dt:
+          type: string
+          description: (RFC 3339) Beginning of the window when an order must be dropped
+            off. Must be less than or equal to pickup_deadline_dt.
+          format: timestamp
+          example: 2024-12-12T14:30:00Z
+        dropoff_deadline_dt:
+          type: string
+          description: (RFC 3339) End of the window when an order must be dropped
+            off. Must be at least 20 mins later than dropoff_ready_dt and must be
+            greater than or equal to pickup_deadline_dt.
+          format: timestamp
+          example: 2024-12-12T16:00:00Z
+        pickup_phone_number:
+          pattern: "^\\+[0-9]+$"
+          type: string
+          description: Phone number for the pickup location, usually the store's contact. This number allows the courier to call before heading to the dropoff location.
+          example: '+15555555555'
+        dropoff_phone_number:
+          pattern: "^\\+[0-9]+$"
+          type: string
+          description: Phone number for the dropoff location, usually belonging to the end-user (recipient). This number enables the courier to make calls after en route to the dropoff and before completing the trip.
+          example: '+15555555555'
+        manifest_total_value:
+          type: integer
+          description: 'Value in cents ( ¹/₁₀₀ of currency unit ) of the items in the delivery.  i.e.: $10.99 => 1099.'
+          example: 1000
+        external_store_id:
+          type: string
+          description: |
+            Unique identifier used by our Partners to reference a store or location. Merchants can search for this value in the dashboard, and it is also visible on the billing details report generated by the dashboard.
+
+            **Note:** Please be aware that if you utilize `external_store_id` in the Create Delivery process, you MUST also include this field in your Create Quote API calls.
+          example: my_store_123
+    DeliveryQuoteResp:
+      type: object
+      properties:
+        kind:
+          type: string
+          description: 'The type of object being described. Default: `delivery_quote`'
+          example: delivery_quote
+        id:
+          type: string
+          description: Unique identifier for the quote (always starts with `dqt_`)
+          example: dqt_6gQ2dt31TjiOPfwux-NCXg
+        created:
+          type: string
+          description: Date/Time timestamp (RFC 3339) at which the quote was created.
+          example: 2023-04-06T19:00:37.887Z
+        expires:
+          type: string
+          description: Date/Time timestamp (RFC 3339) after which the quote will no
+            longer be accepted.
+          example: 2023-04-06T19:15:37.887Z
+        fee:
+          type: integer
+          description: Amount in cents (¹/₁₀₀ of currency unit) that will be charged
+            if this delivery is created.
+          example: 600
+        currency:
+          type: string
+          description: 'Three-letter ISO currency code, in lowercase.'
+          example: usd
+          deprecated: true
+        currency_type:
+          type: string
+          description: 'Three-letter ISO currency code, in uppercase.'
+          example: USD
+        dropoff_eta:
+          type: string
+          description: (RFC 3339) Estimated drop-off time.
+          format: timestamp
+          example: 2023-04-06T19:34:22Z
+        duration:
+          type: integer
+          description: Estimated minutes for this delivery to reach dropoff
+          example: 33
+        pickup_duration:
+          type: integer
+          description: Estimated minutes until a courier will arrive at the pickup.
+          example: 24
+        dropoff_deadline:
+          type: string
+          description: When a delivery must be dropped off. This is the end of the
+            dropoff window.
+          format: timestamp
+          example: 2023-04-06T20:09:20Z
+    Error:
+      type: object
+      properties:
+        code:
+          type: string
+          description: "A coded name for the specific error (e.g., `invalid_params`,\
+            \ `duplicate_delivery`, `pickup_window_too_small`)"
+        message:
+          type: string
+          description: "A brief description of the error (e.g., `The parameters of\
+            \ your request were invalid`)"
+        kind:
+          type: string
+          description: 'The kind of response. Default: `error`'
+    401Error:
+      type: object
+      properties:
+        code:
+          type: string
+          description: "A coded name for the specific error (e.g., `invalid_params`,\
+            \ `duplicate_delivery`, `pickup_window_too_small`)"
+        message:
+          type: string
+          description: "A brief description of the error (e.g., `The parameters of\
+            \ your request were invalid`)"
+    ErrorWithMetadata:
+      type: object
+      properties:
+        code:
+          type: string
+          description: "A coded name for the specific error (e.g., `invalid_params`,\
+            \ `duplicate_delivery`, `pickup_window_too_small`)"
+        message:
+          type: string
+          description: "A brief description of the error (e.g., `The parameters of\
+            \ your request were invalid`)"
+        kind:
+          type: string
+          description: 'The kind of response. Default: `error`'
+        metadata:
+          type: object
+          description: '(Optional) Comprehensive details about this error.'
+          properties:
+            delivery_id:
+              type: string
+              description: 'The duplicated delivery ID.'
+    DeliveryReq:
+      required:
+        - dropoff_address
+        - dropoff_name
+        - dropoff_phone_number
+        - manifest_items
+        - pickup_address
+        - pickup_name
+        - pickup_phone_number
+      type: object
+      properties:
+        pickup_name:
+          type: string
+          description: |
+            Designation of the location where the courier will make the pickup. This information will be visible within the courier app.
+
+            **Note:** The app will prioritize the utilization of the `pickup_business_name` if this parameter is provided.
+          example: Store Name
+        pickup_address:
+          type: string
+          description: |
+            JSON string containing pickup address details.
+
+            **Note:** Please note the escaping of the quotes ( \ " ). This is not the simplest format of expression addresses, however, the benefit comes with the corresponding  parsing and accuracy  when it is received by our booking engine. Please refer to our [FAQ section](https://developer.uber.com/docs/deliveries/faq#what-are-the-address-best-practices?) for more information on how to format addresses.
+          example: '{"street_address":["100 Maiden Ln"],"city":"New York","state":"NY","zip_code":"10023","country":"US"}'
+        pickup_phone_number:
+          pattern: "^\\+[0-9]+$"
+          type: string
+          description: Phone number for the pickup location, usually the store's contact. This number allows the courier to call before heading to the dropoff location.
+          example: '+15555555555'
+        dropoff_name:
+          type: string
+          description: Name of the place where the courier will make the dropoff. This information will be visible in the courier app.
+          example: Gordon Shumway
+        dropoff_address:
+          type: string
+          description: |
+            JSON string containing dropoff address details.
+
+            **Note:** Please note the escaping of the quotes ( \ " ). This is not the simplest format of expression addresses, however, the benefit comes with the corresponding  parsing and accuracy  when it is received by our booking engine. Please refer to our [FAQ section](https://developer.uber.com/docs/deliveries/faq#what-are-the-address-best-practices?) for more information on how to format addresses.
+          example: '{"street_address":["30 Lincoln Center Plaza"],"city":"New York","state":"NY","zip_code":"10023","country":"US"}'
+        dropoff_phone_number:
+          pattern: "^\\+[0-9]+$"
+          type: string
+          description: Phone number for the dropoff location, usually belonging to the end-user (recipient). This number enables the courier to make calls after en route to the dropoff and before completing the trip.
+          example: '+15555555555'
+        manifest_items:
+          type: array
+          description: List of items being delivered. This information will be visible in the courier app.
+          items:
+            $ref: '#/components/schemas/ManifestItem'
+        pickup_business_name:
+          type: string
+          description: Business name of the pickup location. This information will be visible in the courier app and will override the pickup_name if provided.
+          example: Store Name
+        pickup_latitude:
+          type: number
+          description: Pickup latitude coordinate.
+          example: 40.7066745
+        pickup_longitude:
+          type: number
+          description: Pickup longitude coordinate.
+          example: -74.0071976
+        pickup_notes:
+          maxLength: 280
+          type: string
+          description: Additional instructions for the courier at the pickup location.
+            Max 280 characters.
+          example: Follow big green 'Pickup' signs in the parking lot
+        pickup_verification:
+          $ref: '#/components/schemas/PickupVerificationRequirement'
+        dropoff_business_name:
+          type: string
+          description: Business name of the dropoff location.
+          example: House of Luciano
+        dropoff_latitude:
+          type: number
+          description: "Dropoff latitude coordinate. This field adds precision to\
+            \ dropoff_address field. For example, if the dropoff address is \"JFK\
+            \ Airport Queens, NY 11430\", it would be highly recommended to use coordinates\
+            \ to locate the precise location of the dropoff"
+          example: 40.7727076
+        dropoff_longitude:
+          type: number
+          description: "Dropoff longitude coordinate. This field adds precision to\
+            \ dropoff_address field. For example, if the dropoff address is \"JFK\
+            \ Airport Queens, NY 11430\", it would be highly recommended to use coordinates\
+            \ to locate the precise location of the dropoff."
+          example: -73.9839082
+        dropoff_notes:
+          maxLength: 280
+          type: string
+          description: accessible after the courier accepts the trip and before heading to the dropoff location. Limited to 280 characters.
+          example: 'Second floor, black door to the right.'
+        dropoff_seller_notes:
+          maxLength: 280
+          type: string
+          description: Merchant's extra dropoff instructions, accessible after the courier accepts the trip and before heading to the dropoff location. Limited to 280 characters.
+          example: Fragile content - please handle the box with care during delivery.
+        dropoff_verification:
+          $ref: '#/components/schemas/DropoffVerificationRequest'
+        deliverable_action:
+          $ref: '#/components/schemas/DeliverableAction'
+        manifest_reference:
+          type: string
+          description: |
+            A reference identifying the manifest. Utilize this to link a delivery with relevant data in your system. This detail will be visible within the courier app.\
+            **Note:**
+            1. Please be aware that the combination of this field with `external_id` must be unique; otherwise, the delivery creation will not succeed.
+            2. If you can't ensure uniqueness for the manifest_reference, please include the "idempotency_key" in the request body and make sure it is unique.
+          example: REF0000002
+        manifest_total_value:
+          type: integer
+          description: 'Value in cents ( ¹/₁₀₀ of currency unit ) of the items in the delivery.  i.e.: $10.99 => 1099.'
+          example: 1000
+        quote_id:
+          type: string
+          description: The ID of a previously generated delivery quote.
+          example: dqt_gpBlJ0nkTFoZ_KcRPUD8Br
+        undeliverable_action:
+          $ref: '#/components/schemas/UndeliverableAction'
+        pickup_ready_dt:
+          type: string
+          description: (RFC 3339) Beginning of the window when an order must be picked
+            up. Must be less than 30 days in the future.
+          format: timestamp
+          example: 2024-12-12T14:00:00.000Z
+        pickup_deadline_dt:
+          type: string
+          description: (RFC 3339) End of the window when an order may be picked up.
+            Must be at least 10 mins later than pickup_ready_dt and at least 20 minutes
+            in the future from now.
+          format: timestamp
+          example: 2024-12-12T14:30:00.000Z
+        dropoff_ready_dt:
+          type: string
+          description: (RFC 3339) Beginning of the window when an order must be dropped
+            off. Must be less than or equal to pickup_deadline_dt.
+          format: timestamp
+          example: 2024-12-12T14:30:00.000Z
+        dropoff_deadline_dt:
+          type: string
+          description: (RFC 3339) End of the window when an order must be dropped
+            off. Must be at least 20 mins later than dropoff_ready_dt and must be
+            greater than or equal to pickup_deadline_dt.
+          format: timestamp
+          example: 2024-12-12T16:00:00.000Z
+        requires_dropoff_signature:
+          type: boolean
+          description: Flag to indicate this delivery requires signature capture at
+            dropoff.
+          deprecated: true
+        requires_id:
+          type: boolean
+          description:
+            (Please use "dropoff_verification -> identification" instead). Flag to indicate this delivery requires ID check (minimum age)
+            at dropoff.
+          deprecated: true
+          example: false
+        tip:
+          minimum: 0
+          type: integer
+          description: |
+
+            Amount in cents ( ¹/₁₀₀ of currency unit ) that will be paid to the courier as a tip. e.g.: `$5.00` => `500`.
+
+            **Note:** The fee value in the Create Delivery response includes the tip value.
+          example: 500
+        idempotency_key:
+          type: string
+          description: "A key which is used to avoid duplicate order creation with\
+            \ identical idempotency keys for the same account. The key persists for\
+            \ a set time frame, defaulting to 60 minutes."
+          example: '1234567890'
+        external_store_id:
+          type: string
+          description: |
+            Unique identifier used by our Partners to reference a store or location. Merchants can search for this value in the dashboard, and it is also visible on the billing details report generated by the dashboard.
+
+            **Note:** Please be aware that if you utilize `external_store_id` in the Create Delivery process, you MUST also include this field in your Create Quote API calls.
+          example: my_store_123
+        return_verification:
+          $ref: '#/components/schemas/ReturnVerificationRequirement'
+        external_user_info:
+          $ref: '#/components/schemas/DeliveryReq_external_user_info'
+        external_id:
+          type: string
+          description: "Additional reference to identify the manifest. To be used\
+            \ by aggregators, POS systems, and other organization structures which\
+            \ have an internal reference in addition to the manifest_reference used\
+            \ by your sub-account. Merchants can search for this value in the dashboard, and it is also visible on the billing details report generated by the dashboard."
+          example: '1234567890'
+    StructuredAddress:
+      type: object
+      properties:
+        street_address:
+          type: array
+          description: "Array of street address elements. For example: [\"2000 Ocean\
+            \ Ave\", \"Floor 2\" ]"
+        city:
+          type: string
+        state:
+          type: string
+        zip_code:
+          type: string
+        country:
+          type: string
+    ManifestItem:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Description of item.
+          example: Bow tie
+        quantity:
+          minimum: 1
+          type: integer
+          description: Quantity of items.
+          example: 1
+        size:
+          type: string
+          description: |
+            Approximate size of item:
+            | Size | Description |
+            |--------|--------|
+            | small  | You can carry it with one hand e.g. bottle of water. |
+            | medium | You need a tote bag to carry it e.g. retail bag. |
+            | large  | You need two hands to carry it e.g. computer monitor. |
+            | xlarge | You need two hands to carry it e.g. 42 inch Flat Screen TV. |
+
+            **Note:** If nothing is specified, small will be applied by default.
+          enum:
+            - small
+            - medium
+            - large
+            - xlarge
+        dimensions:
+          $ref: '#/components/schemas/ManifestItemDimensions'
+        price:
+          type: integer
+          description: '(optional) Price in cents  ( ¹/₁₀₀ of currency unit ).'
+          example: 100
+        must_be_upright:
+          type: boolean
+          description: "Whether the item should be in upright position (box of pizza,\
+            \ bottle of milk etc)."
+          example: false
+        weight:
+          minimum: 1
+          type: integer
+          description: Weight in grams.
+          example: 300
+        vat_percentage:
+          type: integer
+          description: 'The percentage of VAT (value add tax) associated to the manifest_items. i.e.: 12.5% => 1250000.'
+          example: 1250000
+    ManifestItemSize:
+      type: object
+      properties:
+        small:
+          type: string
+          description: You can carry it with one hand e.g. bottle of water.
+        medium:
+          type: string
+          description: You need a tote bag to carry it e.g. retail bag.
+        large:
+          type: string
+          description: You need two hands to carry it e.g. computer monitor.
+        xlarge:
+          type: string
+          description: You need two hands to carry it e.g. 42 inch Flat Screen TV.
+        big:
+          type: string
+          description: Same as large.
+    ManifestItemDimensions:
+      type: object
+      properties:
+        length:
+          minimum: 1
+          type: integer
+          description: Length in centimeters
+          example: 20
+        height:
+          minimum: 1
+          type: integer
+          description: Height in centimeters
+          example: 20
+        depth:
+          minimum: 1
+          type: integer
+          description: Depth in centimeters
+          example: 20
+      description: |
+        Struct that contains dimensions. Note that `weight` is required when dimensions(`length`, `depth` and `height`) are provided.
+    DeliverableAction:
+      type: string
+      description: |
+        Specify the action for the courier to take on a delivery.
+        | Name | Description |
+        | ---- | ----- |
+        | deliverable_action_meet_at_door | Meet at door delivery. This is the default if DeliverableAction is not set. |
+        | deliverable_action_leave_at_door | The “happy path” action for the courier to take on a delivery. When used, delivery action can be set to “leave at door” for a contactless delivery. Cannot leave at door when signature or ID verification requirements are applied when creating a delivery. Photo confirmation of delivery will be automatically applied as a requirement to complete drop-off. |
+      enum:
+        - deliverable_action_meet_at_door
+        - deliverable_action_leave_at_door
+    UpdatePickupVerificationRequirement:
+      type: object
+      properties:
+        barcodes:
+          type: array
+          description: Barcode values/types that must be scanned at the waypoint.
+            Number of elements in the array is equal to the number of barcodes that
+            must be scanned.
+          items:
+            $ref: '#/components/schemas/BarcodeRequirement'
+      description: Verification steps (e.g. Barcode scanning) that must be taken before the pickup can be completed.
+    PickupVerificationRequirement:
+      type: object
+      properties:
+        signature:
+          type: boolean
+          description: Flag for if a signature is required at this waypoint. `signature_requirement`
+            should be used instead.
+          deprecated: true
+        signature_requirement:
+          $ref: '#/components/schemas/SignatureRequirement'
+        barcodes:
+          type: array
+          description: Barcode values/types that must be scanned at the waypoint.
+            Number of elements in the array is equal to the number of barcodes that
+            must be scanned.
+          items:
+            $ref: '#/components/schemas/BarcodeRequirement'
+        identification:
+          $ref: '#/components/schemas/IdentificationRequirement'
+        picture:
+          type: boolean
+          description: Flag to indicate whether a photo is mandatory at this waypoint.
+      description: Verification steps (e.g. Picture, Barcode scanning) that must be taken before the pickup can be completed.
+    UpdateDropoffVerificationRequest:
+      type: object
+      properties:
+        barcodes:
+          type: array
+          description: Barcode values/types that must be scanned at the waypoint.
+            Number of elements in the array is equal to the number of barcodes that
+            must be scanned.
+          items:
+            $ref: '#/components/schemas/BarcodeRequirement'
+      description: "Verification steps (e.g. Barcode scanning) that must\
+        \ be taken before the dropoff can be completed."
+    DropoffVerificationRequest:
+      type: object
+      properties:
+        signature:
+          type: boolean
+          description: Flag for if a signature is required at this waypoint.
+          deprecated: true
+        signature_requirement:
+          $ref: '#/components/schemas/SignatureRequirement'
+        barcodes:
+          type: array
+          description: Barcode values/types that must be scanned at the waypoint.
+            Number of elements in the array is equal to the number of barcodes that
+            must be scanned.
+          items:
+            $ref: '#/components/schemas/BarcodeRequirement'
+        pincode:
+          $ref: '#/components/schemas/PincodeRequest'
+        identification:
+          $ref: '#/components/schemas/IdentificationRequirement'
+        picture:
+          type: boolean
+          description: "When set to true, mandates the Courier to capture an image\
+            \ as proof of delivery."
+      description: "Verification steps (e.g. Picture, Barcode scanning) that must\
+        \ be taken before the dropoff can be completed."
+    DropoffVerificationResp:
+      type: object
+      properties:
+        signature:
+          type: boolean
+          description: Flag for if a signature is required at this waypoint.
+          deprecated: true
+        signature_requirement:
+          $ref: '#/components/schemas/SignatureRequirement'
+        barcodes:
+          type: array
+          description: Barcode values/types that must be scanned at the waypoint.
+            Number of elements in the array is equal to the number of barcodes that
+            must be scanned.
+          items:
+            $ref: '#/components/schemas/BarcodeRequirement'
+        pincode:
+          $ref: '#/components/schemas/PincodeRequirement'
+        identification:
+          $ref: '#/components/schemas/IdentificationRequirement'
+        picture:
+          type: boolean
+          description: "When set to true, mandates the Courier to capture an image\
+            \ as proof of delivery."
+      description: "Verification steps (e.g. Picture, barcode scanning) that must\
+        \ be taken before the dropoff can be completed."
+    ReturnVerificationRequirement:
+      type: object
+      properties:
+        signature:
+          type: boolean
+          description: Flag for if a signature is required at this waypoint.
+          deprecated: true
+        signature_requirement:
+          $ref: '#/components/schemas/SignatureRequirement'
+        barcodes:
+          type: array
+          description: Barcode values/types that must be scanned at the waypoint.
+            Number of elements in the array is equal to the number of barcodes that
+            must be scanned.
+          items:
+            $ref: '#/components/schemas/BarcodeRequirement'
+        picture:
+          type: boolean
+          description: Picture captured at the return waypoint.
+      description: "Verification steps (barcode scanning, picture, or signature) that\
+        \ must be taken before the return can be completed."
+    BarcodeRequirement:
+      type: object
+      properties:
+        value:
+          type: string
+          description: String value encoded in the barcode.
+        type:
+          type: string
+          description: "Type of barcode. Valid values: \"CODE39\", \"CODE39_FULL_ASCII\"\
+            , \"CODE128\", \"QR\"."
+          enum:
+            - CODE39
+            - CODE39_FULL_ASCII
+            - CODE128
+            - QR
+    PincodeRequirement:
+      type: object
+      properties:
+        enabled:
+          type: boolean
+          description: "When set to true in POST requests, the delivery will require\
+            \ pincode entry at handoff."
+        value:
+          type: string
+          description: "The pincode that the customer must present at dropoff. The pin code\
+            \ is internally generated when this requirement is present and shared by Uber."
+          example: '1234'
+    PincodeRequest:
+      type: object
+      properties:
+        enabled:
+          type: boolean
+          description: "When set to true in POST requests, the delivery will require\
+            \ pincode entry at handoff. The pincode is internally generated and shared by Uber."
+    IdentificationRequirement:
+      type: object
+      properties:
+        min_age:
+          type: number
+          description: Minimum age that must be verified for this delivery. Please refer to [Identification](https://developer.uber.com/docs/deliveries/guides/proof-of-delivery#identification) guide for more information.
+          example: 21
+      description: Identification scanning/verification requirements for this waypoint.
+    VerificationProof:
+      type: object
+      properties:
+        signature:
+          $ref: '#/components/schemas/SignatureProof'
+        barcodes:
+          type: array
+          description: Barcode values/types that were scanned.
+          items:
+            $ref: '#/components/schemas/BarcodeProof'
+        picture:
+          $ref: '#/components/schemas/PictureProof'
+        identification:
+          $ref: '#/components/schemas/IdentificationProof'
+        pin_code:
+          $ref: '#/components/schemas/PincodeProof'
+        completion_location:
+          $ref: '#/components/schemas/LatLng'
+    SignatureProof:
+      type: object
+      properties:
+        image_url:
+          type: string
+          description: The URL of the signature image.
+          example: https://tb-static.uber.com/prod/file-upload/uploads/courier-task-platform/82a0d88e-100d-40d6-a0d0-ea9c4a2e55bb
+        name:
+          type: string
+          description: The name of the person who signed for the package.
+          example: Joan
+        signer_relationship:
+          type: string
+          description: The relationship of the person who signed for the package to
+            the intended recipient.
+          enum:
+            - SELF
+            - INVALID
+            - FRIEND
+            - LEGAL_REPRESENTATIVE
+            - PARENT_OR_GUARDIAN
+            - SPOUSE
+    SignatureRequirement:
+      type: object
+      properties:
+        enabled:
+          type: boolean
+          description: Flag for if a signature is required at this waypoint.
+        collect_signer_name:
+          type: boolean
+          description: Flag for if the signer's name is required at this waypoint.
+        collect_signer_relationship:
+          type: boolean
+          description: Flag for if the signer's relationship to the intended recipient
+            is required at this waypoint.
+      description: Signature requirement spec to indicate that a signature must be
+        collected at this waypoint.
+    PictureProof:
+      type: object
+      properties:
+        image_url:
+          type: string
+          description: The URL of the image taken at the waypoint.
+          example: https://tb-static.uber.com/prod/file-upload/uploads/courier-task-platform/82a0d88e-100d-40d6-a0d0-ea9c4a2e55bb
+    IdentificationProof:
+      type: object
+      properties:
+        min_age_verified:
+          type: boolean
+          description: Flag if ID was successfully verified/scanned.
+          example: false
+    PincodeProof:
+      type: object
+      properties:
+        entered:
+          type: string
+          description: Value entered during PIN verification.
+          example: '3902'
+    BarcodeProof:
+      type: object
+      properties:
+        type:
+          type: string
+          description: "Type of barcode. Valid values: \"CODE39\", \"CODE39_FULL_ASCII\"\
+            , \"CODE128\", \"QR\"."
+          example: CODE128
+        value:
+          type: string
+          description: String value encoded in the barcode.
+          example: '1234567890'
+        scan_result:
+          $ref: '#/components/schemas/BarcodeScanResult'
+    BarcodeScanResult:
+      type: object
+      properties:
+        outcome:
+          type: string
+          description: Outcome of the barcode scanning
+          enum:
+            - SUCCESS
+            - INVALID
+            - SKIPPED
+        timestamp:
+          type: string
+          description: Timestamp when the barcode was scanned or skipped
+          format: datetime
+          example: 2023-05-02T04:34:04.957Z
+    UndeliverableAction:
+      type: string
+      description: |
+        If not set then the default value is `return`
+
+          - `leave_at_door`: Once a normal delivery attempt is made and a customer is not available. This action requests the courier to leave the package at dropoff location.
+
+          **Note 1:** It cannot be set to `leave at door` when signature or PIN or ID verification requirements are applied when creating a delivery.
+
+          **Note 2:** A photo confirmation of delivery will be automatically applied as a requirement to complete the dropoff.
+
+          - `return`:  Once a normal delivery attempt is made and a customer is not available. This action requests the courier to return the package back to the pickup location.
+
+          **Note:** Even if `deliverable_action` was set as `leave at door` and courier feels it is not okay then the package can be returned back to the pickup location.
+
+          - `discard`: Discard option will allow the courier to keep/throw away the package if they are unable to deliver the package.
+      enum:
+        - leave_at_door
+        - return
+        - discard
+    GetDeliveryResp:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the delivery (`del_` + tokenize(uuid)).
+          example: del_gDcyfRgyQcyN0obpqqS_1B
+        quote_id:
+          type: string
+          description: ID for the Delivery Quote if one was provided when creating
+            this delivery.
+          example: dqt_6gQ2dt31TjiOPfwux-NCXg
+        complete:
+          type: boolean
+          description: 'Flag indicating if the delivery has ended, regardless of the possible end status values: `delivered`, `canceled`, `returned`.'
+          example: false
+        courier:
+          $ref: '#/components/schemas/CourierInfo'
+        courier_imminent:
+          type: boolean
+          description: Flag indicating if the courier is close to the pickup or dropoff
+            location.
+        created:
+          type: string
+          description: Date/time at which the delivery was created.
+          format: timestamp
+          example: 2023-05-01T22:15:13.646Z
+        currency:
+          type: string
+          description: 'Three-letter ISO currency code, in lowercase.'
+          example: usd
+        deliverable_action:
+          $ref: '#/components/schemas/DeliverableAction'
+        dropoff:
+          $ref: '#/components/schemas/WaypointInfo'
+        dropoff_deadline:
+          type: string
+          description: When a delivery must be dropped off. This is the end of the
+            dropoff window.
+          format: timestamp
+          example: 2023-05-01T23:01:37.000Z
+        dropoff_eta:
+          type: string
+          description: Estimated dropoff time.
+          format: timestamp
+          example: 2023-05-01T22:30:00.077Z
+        dropoff_identifier:
+          type: string
+          description: This field identifies who received delivery at the dropoff
+            location.
+          example: ''
+        dropoff_ready:
+          type: string
+          description: When a delivery is ready to be dropped off. This is the start
+            of the dropoff window.
+          format: timestamp
+          example: 2023-05-01T22:15:13.000Z
+        external_id:
+          type: string
+          description: An ID for an account as stored in a merchant's external system.
+          example: EI000001
+        fee:
+          type: integer
+          description: 'Amount in cents ( ¹/₁₀₀ of currency unit ) that will be charged if this delivery is created.'
+          example: 1099
+        kind:
+          type: string
+          description: The type of object being described. Always "delivery".
+          example: delivery
+        live_mode:
+          type: boolean
+          description: Flag that indicates if this is live mode or test mode.
+        manifest:
+          $ref: '#/components/schemas/ManifestInfo'
+        manifest_items:
+          $ref: '#/components/schemas/ManifestItem'
+        pickup:
+          $ref: '#/components/schemas/WaypointInfo'
+        pickup_deadline:
+          type: string
+          description: When a delivery must be picked up by. This is the end of the
+            pickup window.
+          format: timestamp
+          example: 2023-05-01T22:35:13.000Z
+        pickup_eta:
+          type: string
+          description: Estimated time the courier will arrive at the pickup location.
+          format: timestamp
+          example: 2023-05-01T22:16:21.749Z
+        pickup_ready:
+          type: string
+          description: When a delivery is ready to be picked up. This is the start
+            of the pickup window.
+          format: timestamp
+        related_deliveries:
+          $ref: '#/components/schemas/RelatedDelivery'
+        status:
+          type: string
+          description: The current status of the delivery. Always pending when the
+            delivery is created.
+          enum:
+            - pending
+            - pickup
+            - pickup_complete
+            - dropoff
+            - delivered
+            - canceled
+            - returned
+        tip:
+          minimum: 0
+          type: integer
+          description: 'Amount in cents ( ¹/₁₀₀ of currency unit ) that will be paid to the courier as a tip.'
+          example: 500
+        tracking_url:
+          type: string
+          description: This URL can be used to track the courier during the delivery
+            (via an unauthenticated webpage).
+          example: https://www.ubereats.com/orders/62105936-e413-40d5-aecd-4c335c3cd3c2
+        undeliverable_action:
+          type: string
+          description: |
+            This does not reflect the `undeliverable_action` specified in the delivery request. If a delivery was undeliverable, this field will contain the resulting action taken by the courier.
+            | Name | Description |
+            | ---- | ---- |
+            | "" | The delivery is not yet completed or the delivery was successful. |
+            | "left_at_door" | The courier left the delivery at the dropoff waypoint after failing to hand over the delivery successfully to the dropoff person. Refer the photo confirmation of the delivery through `dropoff.verification.picture`. |
+            | "returned" | The courier returned the delivery to the pickup waypoint after failing to complete the delivery. |
+          enum:
+            - ''
+            - returned
+            - left_at_door
+        undeliverable_reason:
+          type: string
+          description: "If a delivery was undeliverable, this field will contain the\
+            \ reason why it was undeliverable, otherwise this field will remain as\
+            \ an empty string \"\". For example: `NO_SECURE_LOCATION_TO_DROPOFF`"
+          example: ''
+        updated:
+          type: string
+          description: Date/Time at which the delivery was last updated.
+          format: timestamp
+          example: 2023-05-01T22:16:20.023Z
+        uuid:
+          type: string
+          description: Alternative delivery identifier. The `id` field should be used
+            for any identification purposes. The `uuid` field is equally unique but
+            loses contextual information - Nothing in this identifier indicates that
+            it points to a Delivery. `uuid` is case-sensitive. Value for the `1uuid`
+            field is UUID v4 with `-` characters removed.
+          example: 62105936E41340D5AECD4C335C3CD3C2
+        return:
+          $ref: '#/components/schemas/WaypointInfo'
+        refund:
+          $ref: '#/components/schemas/Refund'
+        batch_id:
+          type: string
+          description: Unique identifier of the batch. This field will determine what orders should be batched together by store operations for courier pickup.
+          example: bat_0dtbO9MhUAW6yezXDqQUqQ
+    CreateDeliveryResp:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the delivery (`del_` + tokenize(uuid)).
+          example: del_gDcyfRgyQcyN0obpqqS_1B
+        quote_id:
+          type: string
+          description: ID for the Delivery Quote if one was provided when creating
+            this delivery.
+          example: dqt_6gQ2dt31TjiOPfwux-NCXg
+        complete:
+          type: boolean
+          description: 'Flag indicating if the delivery has ended, regardless of the possible end status values: `delivered`, `canceled`, `returned`.'
+          example: false
+        courier:
+          $ref: '#/components/schemas/CourierInfo'
+        courier_imminent:
+          type: boolean
+          description: Flag indicating if the courier is close to the pickup or dropoff
+            location.
+        created:
+          type: string
+          description: Date/time at which the delivery was created.
+          format: timestamp
+          example: 2023-05-01T22:15:13.646Z
+        currency:
+          type: string
+          description: 'Three-letter ISO currency code, in lowercase.'
+          example: usd
+        deliverable_action:
+          $ref: '#/components/schemas/DeliverableAction'
+        dropoff:
+          $ref: '#/components/schemas/CreateDeliveryWaypointInfo'
+        dropoff_deadline:
+          type: string
+          description: When a delivery must be dropped off. This is the end of the
+            dropoff window.
+          format: timestamp
+          example: 2023-05-01T23:01:37.000Z
+        dropoff_eta:
+          type: string
+          description: Estimated dropoff time.
+          format: timestamp
+          example: 2023-05-01T22:30:00.077Z
+        dropoff_identifier:
+          type: string
+          description: This field identifies who received delivery at the dropoff
+            location.
+          example: ''
+        dropoff_ready:
+          type: string
+          description: When a delivery is ready to be dropped off. This is the start
+            of the dropoff window.
+          format: timestamp
+          example: 2023-05-01T22:15:13.000Z
+        external_id:
+          type: string
+          description: An ID for an account as stored in a merchant's external system.
+          example: EI000001
+        fee:
+          type: integer
+          description: 'Amount in cents ( ¹/₁₀₀ of currency unit ) that will be charged if this delivery is created.'
+          example: 1099
+        kind:
+          type: string
+          description: The type of object being described. Always "delivery".
+          example: delivery
+        live_mode:
+          type: boolean
+          description: Flag that indicates if this is live mode or test mode.
+        manifest:
+          $ref: '#/components/schemas/ManifestInfo'
+        manifest_items:
+          $ref: '#/components/schemas/ManifestItem'
+        pickup:
+          $ref: '#/components/schemas/WaypointInfo'
+        pickup_deadline:
+          type: string
+          description: When a delivery must be picked up by. This is the end of the
+            pickup window.
+          format: timestamp
+          example: 2023-05-01T22:35:13.000Z
+        pickup_eta:
+          type: string
+          description: Estimated time the courier will arrive at the pickup location.
+          format: timestamp
+          example: 2023-05-01T22:16:21.749Z
+        pickup_ready:
+          type: string
+          description: When a delivery is ready to be picked up. This is the start
+            of the pickup window.
+          format: timestamp
+        related_deliveries:
+          $ref: '#/components/schemas/RelatedDelivery'
+        status:
+          type: string
+          description: The current status of the delivery. Always pending when the
+            delivery is created.
+          enum:
+            - pending
+            - pickup
+            - pickup_complete
+            - dropoff
+            - delivered
+            - canceled
+            - returned
+        tip:
+          minimum: 0
+          type: integer
+          description: 'Amount in cents ( ¹/₁₀₀ of currency unit ) that will be paid to the courier as a tip.'
+          example: 500
+        tracking_url:
+          type: string
+          description: This URL can be used to track the courier during the delivery
+            (via an unauthenticated webpage).
+          example: https://www.ubereats.com/orders/62105936-e413-40d5-aecd-4c335c3cd3c2
+        undeliverable_action:
+          type: string
+          description: |
+            This does not reflect the `undeliverable_action` specified in the delivery request. If a delivery was undeliverable, this field will contain the resulting action taken by the courier.
+            | Name | Description |
+            | ---- | ---- |
+            | "" | The delivery is not yet completed or the delivery was successful. |
+            | "left_at_door" | The courier left the delivery at the dropoff waypoint after failing to hand over the delivery successfully to the dropoff person. Refer the photo confirmation of the delivery through `dropoff.verification.picture`. |
+            | "returned" | The courier returned the delivery to the pickup waypoint after failing to complete the delivery. |
+          enum:
+            - ''
+            - returned
+            - left_at_door
+        undeliverable_reason:
+          type: string
+          description: "If a delivery was undeliverable, this field will contain the\
+            \ reason why it was undeliverable, otherwise this field will remain as\
+            \ an empty string \"\". For example: `NO_SECURE_LOCATION_TO_DROPOFF`"
+          example: ''
+        updated:
+          type: string
+          description: Date/Time at which the delivery was last updated.
+          format: timestamp
+          example: 2023-05-01T22:16:20.023Z
+        uuid:
+          type: string
+          description: Alternative delivery identifier. The `id` field should be used
+            for any identification purposes. The `uuid` field is equally unique but
+            loses contextual information - Nothing in this identifier indicates that
+            it points to a Delivery. `uuid` is case-sensitive. Value for the `1uuid`
+            field is UUID v4 with `-` characters removed.
+          example: 62105936E41340D5AECD4C335C3CD3C2
+        return:
+          $ref: '#/components/schemas/WaypointInfo'
+        batch_id:
+          type: string
+          description: Unique identifier of the batch. This field will determine what orders should be batched together by store operations for courier pickup.
+          example: bat_0dtbO9MhUAW6yezXDqQUqQ
+    DeliveryResp:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the delivery (`del_` + tokenize(uuid)).
+          example: del_gDcyfRgyQcyN0obpqqS_1B
+        quote_id:
+          type: string
+          description: ID for the Delivery Quote if one was provided when creating
+            this delivery.
+          example: dqt_6gQ2dt31TjiOPfwux-NCXg
+        complete:
+          type: boolean
+          description: 'Flag indicating if the delivery has ended, regardless of the possible end status values: `delivered`, `canceled`, `returned`.'
+          example: false
+        courier:
+          $ref: '#/components/schemas/CourierInfo'
+        courier_imminent:
+          type: boolean
+          description: Flag indicating if the courier is close to the pickup or dropoff
+            location.
+        created:
+          type: string
+          description: Date/time at which the delivery was created.
+          format: timestamp
+          example: 2023-05-01T22:15:13.646Z
+        currency:
+          type: string
+          description: 'Three-letter ISO currency code, in lowercase.'
+          example: usd
+        deliverable_action:
+          $ref: '#/components/schemas/DeliverableAction'
+        dropoff:
+          $ref: '#/components/schemas/WaypointInfo'
+        dropoff_deadline:
+          type: string
+          description: When a delivery must be dropped off. This is the end of the
+            dropoff window.
+          format: timestamp
+          example: 2023-05-01T23:01:37.000Z
+        dropoff_eta:
+          type: string
+          description: Estimated dropoff time.
+          format: timestamp
+          example: 2023-05-01T22:30:00.077Z
+        dropoff_identifier:
+          type: string
+          description: This field identifies who received delivery at the dropoff
+            location.
+          example: ''
+        dropoff_ready:
+          type: string
+          description: When a delivery is ready to be dropped off. This is the start
+            of the dropoff window.
+          format: timestamp
+          example: 2023-05-01T22:15:13.000Z
+        external_id:
+          type: string
+          description: An ID for an account as stored in a merchant's external system.
+          example: EI000001
+        fee:
+          type: integer
+          description: 'Amount in cents ( ¹/₁₀₀ of currency unit ) that will be charged if this delivery is created.'
+          example: 1099
+        kind:
+          type: string
+          description: The type of object being described. Always "delivery".
+          example: delivery
+        live_mode:
+          type: boolean
+          description: Flag that indicates if this is live mode or test mode.
+        manifest:
+          $ref: '#/components/schemas/ManifestInfo'
+        manifest_items:
+          $ref: '#/components/schemas/ManifestItem'
+        pickup:
+          $ref: '#/components/schemas/WaypointInfo'
+        pickup_deadline:
+          type: string
+          description: When a delivery must be picked up by. This is the end of the
+            pickup window.
+          format: timestamp
+          example: 2023-05-01T22:35:13.000Z
+        pickup_eta:
+          type: string
+          description: Estimated time the courier will arrive at the pickup location.
+          format: timestamp
+          example: 2023-05-01T22:16:21.749Z
+        pickup_ready:
+          type: string
+          description: When a delivery is ready to be picked up. This is the start
+            of the pickup window.
+          format: timestamp
+        related_deliveries:
+          $ref: '#/components/schemas/RelatedDelivery'
+        status:
+          type: string
+          description: The current status of the delivery. Always pending when the
+            delivery is created.
+          enum:
+            - pending
+            - pickup
+            - pickup_complete
+            - dropoff
+            - delivered
+            - canceled
+            - returned
+        tip:
+          minimum: 0
+          type: integer
+          description: 'Amount in cents ( ¹/₁₀₀ of currency unit ) that will be paid to the courier as a tip.'
+          example: 500
+        tracking_url:
+          type: string
+          description: This URL can be used to track the courier during the delivery
+            (via an unauthenticated webpage).
+          example: https://www.ubereats.com/orders/62105936-e413-40d5-aecd-4c335c3cd3c2
+        undeliverable_action:
+          type: string
+          description: |
+            This does not reflect the `undeliverable_action` specified in the delivery request. If a delivery was undeliverable, this field will contain the resulting action taken by the courier.
+            | Name | Description |
+            | ---- | ---- |
+            | "" | The delivery is not yet completed or the delivery was successful. |
+            | "left_at_door" | The courier left the delivery at the dropoff waypoint after failing to hand over the delivery successfully to the dropoff person. Refer the photo confirmation of the delivery through `dropoff.verification.picture`. |
+            | "returned" | The courier returned the delivery to the pickup waypoint after failing to complete the delivery. |
+          enum:
+            - ''
+            - returned
+            - left_at_door
+        undeliverable_reason:
+          type: string
+          description: "If a delivery was undeliverable, this field will contain the\
+            \ reason why it was undeliverable, otherwise this field will remain as\
+            \ an empty string \"\". For example: `NO_SECURE_LOCATION_TO_DROPOFF`"
+          example: ''
+        updated:
+          type: string
+          description: Date/Time at which the delivery was last updated.
+          format: timestamp
+          example: 2023-05-01T22:16:20.023Z
+        uuid:
+          type: string
+          description: Alternative delivery identifier. The `id` field should be used
+            for any identification purposes. The `uuid` field is equally unique but
+            loses contextual information - Nothing in this identifier indicates that
+            it points to a Delivery. `uuid` is case-sensitive. Value for the `1uuid`
+            field is UUID v4 with `-` characters removed.
+          example: 62105936E41340D5AECD4C335C3CD3C2
+        return:
+          $ref: '#/components/schemas/WaypointInfo'
+    PODResp:
+      type: object
+      properties:
+        document:
+          type: string
+          description: A long Base64 string representing the image.
+          example: iVBORw0KGgoAAAANSUhEUgAAAAgAAAAIAQMAAAD+wSzIAAAABlBMVEX///+/v7+jQ3Y5AAAADklEQVQI12P4AIX8EAgALgAD/aNpbtEAAAAASUVORK5CYII
+    CourierInfo:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Courier's first name and last initial.
+          example: Alex I.
+        rating:
+          type: number
+          description: (DEPRECATED) Courier's rating on a scale of 1.0 to 5.0
+          deprecated: true
+        vehicle_type:
+          type: string
+          description: "The type of vehicle the courier is using. Currently supports\
+            \ bicycle, car, van, truck, scooter, motorcycle, and walker."
+          example: car
+        phone_number:
+          type: string
+          description: The courier's phone number. This is a masked phone number that
+            can only receive calls or SMS from the dropoff phone number.
+          example: '+16283337630'
+        location:
+          $ref: '#/components/schemas/LatLng'
+        img_href:
+          type: string
+          description: A URL to the courier's profile image.
+          example: https://d1w2poirtb3as9.cloudfront.net/default.jpeg?Expires=1683022587&Signature=SDlYXhlrNUXVibLEi1veShGrVQqn~5cHlDmKHmirytOvtRPLUzMICPLoLXL8vn7XREKo6XmRjYbE~tMeCqBf3Pjyc4OKqsAyukoUr5ew7S9ipbJ-O0PCp5ThZ4j46yZquza1s~qOQISHopH734F17BaNxod9E9QPJJ3phFcrl4COKYSt3qPsn9Y9PQxyKecJ5Sr0RveI5hGqtQR~u2d3EZgXmJxuGUdk26WX-Ho1h3ziIpnIBu6P6upbOtlnxLqn-dG7tl15pnn~bW1w0qAemFUUdqWzzWfjVGLHonDqE4LM5xE~t1T~1zJCNQ-uzijjI6tnEfIHJ9LgWRRhX3sKXQ__&Key-Pair-Id=K36LFL06Z5BT10
+    LatLng:
+      type: object
+      properties:
+        lat:
+          type: number
+          description: Latitude.
+          example: 37.765987
+        lng:
+          type: number
+          description: Longitude.
+          example: -122.43153
+    Refund:
+      type: object
+      properties:
+        created_at:
+          type: string
+          format: date-time
+          description: Date/Time at which the refund was created in UTC Time.
+          example: '2023-03-24T19:02:05Z'
+        currency_code:
+          type: string
+          description: 'Three-letter ISO currency code, in uppercase.'
+          example: 'GBP'
+        id:
+          type: string
+          description: Unique identifier of the refund request.
+          example: 'ffe2c0b4-204f-41ca-9230-2b161b8d6c4b'
+        refund_fees:
+          type: array
+          items:
+            $ref: '#/components/schemas/RefundFee'
+          description: Array of refund fees for the refund.
+        refund_order_items:
+          type: array
+          items:
+            $ref: '#/components/schemas/RefundOrderItem'
+          description: Array of refund order items for the refund.
+        total_partner_refund:
+          type: number
+          description: Total monetary amount that the partner is liable to their customers for in cents ( ¹/₁₀₀ of currency unit ).
+          example: '680'
+        total_uber_refund:
+          type: number
+          description: Total monetary amount that Uber will adjust on the billing details report & invoice in cents ( ¹/₁₀₀ of currency unit ).
+          example: '680'
+    RefundFee:
+      type: object
+      properties:
+        category:
+          type: string
+          description: The category of the refund fee. "DELIVERY" or "TAX".
+          example: 'DELIVERY'
+        fee_code:
+          type: string
+          description: The fee code associated with the refund fee. "UBER_DELIVERY_FEE", "PARTNER_FEE" or "PARTNER_TAX".
+          example: 'UBER_DELIVERY_FEE'
+        value:
+          type: integer
+          description: The amount of the refund fee of the given category.
+          example: '680'
+    RefundOrderItem:
+      type: object
+      properties:
+        partner_refund_amount:
+          type: number
+          description: The monetary value of items that the partner is liable towards their customers in cents ( ¹/₁₀₀ of currency unit ).
+          example: '680'
+        party_at_fault:
+          type: string
+          description: “UBER” or “PARTNER”.
+          example: “UBER”
+        reason:
+          type: string
+          description: A predefined string of refund reason.
+          example: 'UBER_ITEM_QUALITY_ISSUE'
+        refund_items:
+          type: array
+          items:
+            $ref: '#/components/schemas/RefundItem'
+          description: Array of refund items for the refund.
+        uber_refund_amount:
+          type: number
+          description: The refund amount from Uber's perspective.
+          example: '680'
+    RefundItem:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The name of the item.
+          example: 'House Tofu-med Firm Regular'
+        quantity:
+          type: integer
+          description: The quantity of the item.
+          example: '1'
+    CreateDeliveryWaypointInfo:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Display name of the person/merchant at the waypoint.
+          example: Joan P.
+        phone_number:
+          type: string
+          description: The masked phone number of the waypoint.
+          example: '+16283337630'
+        address:
+          type: string
+          description: The address of the waypoint.
+          example: '2200 Market St, San Francisco, CA 94114, US'
+        detailed_address:
+          $ref: '#/components/schemas/Address'
+        notes:
+          type: string
+          description: Additional instructions at the waypoint location.
+          example: ''
+        seller_notes:
+          type: string
+          description: Delivery instructions provided by the seller for the courier
+            at the waypoint location.
+          example: ''
+        courier_notes:
+          type: string
+          description: "When a picture is requested as proof-of-delivery, this field\
+            \ contains the notes provided by the courier (e.g. where the items were\
+            \ left)."
+          example: ''
+        location:
+          $ref: '#/components/schemas/LatLng'
+        verification_requirements:
+          $ref: '#/components/schemas/DropoffVerificationResp'
+        status:
+          type: string
+          description: Delivery status in respect to the waypoint location
+          enum:
+            - completed
+            - failed
+        status_timestamp:
+          type: string
+          description: Timestamp of when the status was triggered
+          format: timestamp
+          example: 2023-05-02T02:30:07.560Z
+        external_store_id:
+          type: string
+          description: Unique identifier used by merchants to reference a store or
+            location.
+          example: my_store_123
+    WaypointInfo:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Display name of the person/merchant at the waypoint.
+          example: Joan P.
+        phone_number:
+          type: string
+          description: The masked phone number of the waypoint.
+          example: '+16283337630'
+        address:
+          type: string
+          description: The address of the waypoint.
+          example: '2200 Market St, San Francisco, CA 94114, US'
+        detailed_address:
+          $ref: '#/components/schemas/Address'
+        notes:
+          type: string
+          description: Additional instructions at the waypoint location.
+          example: ''
+        seller_notes:
+          type: string
+          description: Delivery instructions provided by the seller for the courier
+            at the waypoint location.
+          example: ''
+        courier_notes:
+          type: string
+          description: "When a picture is requested as proof-of-delivery, this field\
+            \ contains the notes provided by the courier (e.g. where the items were\
+            \ left)."
+          example: ''
+        location:
+          $ref: '#/components/schemas/LatLng'
+        verification:
+          $ref: '#/components/schemas/VerificationProof'
+        verification_requirements:
+          $ref: '#/components/schemas/DropoffVerificationResp'
+        status:
+          type: string
+          description: Delivery status in respect to the waypoint location
+          enum:
+            - completed
+            - failed
+        status_timestamp:
+          type: string
+          description: Timestamp of when the status was triggered
+          format: timestamp
+          example: 2023-05-02T02:30:07.560Z
+        external_store_id:
+          type: string
+          description: Unique identifier used by merchants to reference a store or
+            location.
+          example: my_store_123
+    Address:
+      type: object
+      properties:
+        street_address_1:
+          type: string
+          example: 2200 Market St
+        street_address_2:
+          type: string
+          example: ''
+        city:
+          type: string
+          example: San Francisco
+        state:
+          type: string
+          example: CA
+        zip_code:
+          type: string
+          example: '94114'
+        country:
+          type: string
+          example: US
+    ManifestInfo:
+      type: object
+      properties:
+        reference:
+          type: string
+          description: Reference that identifies the manifest.
+          example: EI000001
+        description:
+          type: string
+          description: (DEPRECATED) A detailed description of what the courier will
+            be delivering. It is better to consume the description of each item in
+            `ManifestItem.name`.
+          example: |
+            1 x Package 1
+          deprecated: true
+        total_value:
+          type: integer
+          description: "Value of the items in the delivery, in local currency (as\
+            \ defined by the pickup location). e.g. `$10.99` => `1099` for items in\
+            \ the US."
+          example: 1099
+    RelatedDelivery:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the delivery.
+          example: ret_BiymjKtjTwKpoS2kSIuxlv
+        relationship:
+          type: string
+          description: "Indicates the nature of the delivery identified in `related_deliveries`.\
+            \ `original` for the forward leg of the trip, and `returned` for the return\
+            \ leg of the trip."
+          enum:
+            - return
+            - original
+    UpdateDeliveryReq:
+      type: object
+      properties:
+        dropoff_notes:
+          maxLength: 280
+          type: string
+          description: Additional instructions for the courier at the dropoff location, accessible after the courier accepts the trip and before heading to the dropoff location. Limited to 280 characters.
+          example: 'Second floor, black door to the right.'
+        dropoff_verification:
+          $ref: '#/components/schemas/UpdateDropoffVerificationRequest'
+        manifest_reference:
+          type: string
+          description: |
+            A reference identifying the manifest. Utilize this to link a delivery with relevant data in your system. This detail will be visible within the courier app.\
+            **Note:**
+            1. Please be aware that the combination of this field with `external_id` must be unique; otherwise, the delivery creation will not succeed.
+            2. If you can't ensure uniqueness for the manifest_reference, please include the "idempotency_key" in the request body and make sure it is unique.
+          example: REF0000002
+        pickup_notes:
+          maxLength: 280
+          type: string
+          description: Additional instructions for the courier at the pickup location.
+            Max 280 characters.
+          example: Follow big green 'Pickup' signs in the parking lot
+        pickup_verification:
+          $ref: '#/components/schemas/UpdatePickupVerificationRequirement'
+        requires_dropoff_signature:
+          type: boolean
+          description: Flag to indicate this delivery requires signature capture at
+            dropoff.
+          deprecated: true
+        requires_id:
+          type: boolean
+          description: (Please use "dropoff_verification -> identification" instead). Flag to indicate this delivery requires ID verification.
+          deprecated: true
+          example: false
+        tip_by_customer:
+          type: integer
+          description: 'Amount in cents ( ¹/₁₀₀ of currency unit ) that will be paid to the courier as a tip.'
+          example: 500
+        dropoff_latitude:
+          type: number
+          description: Dropoff latitude coordinate.
+          example: 40.7727076
+        dropoff_longitude:
+          type: number
+          description: Dropoff longitude coordinate.
+          example: -73.9839082
+    PODReq:
+      required:
+        - type
+        - waypoint
+      type: object
+      properties:
+        waypoint:
+          type: string
+          description: The waypoint where the verification requirement was taken.
+          example: dropoff
+          enum:
+            - pickup
+            - dropoff
+            - return
+        type:
+          type: string
+          description: The type of delivery verification requirement.
+          example: picture
+          enum:
+            - picture
+            - signature
+            - pincode
+    inline_response_200:
+      type: object
+      properties:
+        data:
+          type: array
+          description: Array of deliveries matching filters (if any) provided.
+          items:
+            $ref: '#/components/schemas/DeliveryResp'
+        next_href:
+          type: string
+          description: URL for fetching next set of deliveries.
+          example: api.uber.com/v1/customers/d553004e-a505-4c48-8887-194e57769172/deliveries?offset=30
+        total_count:
+          type: integer
+          description: (DEPRECATED) Response is always -1.
+          example: -1
+    DeliveryReq_external_user_info_merchant_account:
+      type: object
+      properties:
+        account_created_at:
+          type: timestamp
+          description: (RFC 3339) End-user's Account creation time.
+          example: 2019-10-12T07:20:50.520Z
+        email:
+          type: string
+          description: (RFC 3339) End-user's email used to create the account.
+          example: 2019-10-12T07:20:50.520Z
+    DeliveryReq_external_user_info_device:
+      type: object
+      properties:
+        id:
+          minimum: 256
+          type: string
+          description: A string that represents the end-user unique device id.
+          example: f2bdcb36-f86b-4197-89f8-54c72f98d24b
+    DeliveryReq_external_user_info:
+      type: object
+      properties:
+        merchant_account:
+          $ref: '#/components/schemas/DeliveryReq_external_user_info_merchant_account'
+        device:
+          $ref: '#/components/schemas/DeliveryReq_external_user_info_device'
+      description: End-user's information to help identify users.
+  parameters:
+    customerId:
+      name: customer_id
+      in: path
+      description: Unique identifier for the organization. Either UUID or starts with
+        `cus_`.
+      required: true
+      style: simple
+      explode: false
+      schema:
+        type: string
+      example: a11e6f29-6850-4d8d-b88d-0ae69cec1111
+    deliveryId:
+      name: delivery_id
+      in: path
+      description: Unique identifier for the delivery. Always starts with del_
+      required: true
+      style: simple
+      explode: false
+      schema:
+        type: string
+      example: del_ExLGCyywQ5KlvncU2rUUUd3
+  examples:
+    address_undeliverable:
+      value:
+        code: address_undeliverable
+        message: The specified location is not in a deliverable area.
+        kind: error
+    unknown_location:
+      value:
+        code: unknown_location
+        message: The specified location was not understood.
+        kind: error
+    pickup_window_too_small:
+      value:
+        code: pickup_window_too_small
+        message: The pickup window needs to be at least 10 minutes long.
+        kind: error
+    dropoff_deadline_too_early:
+      value:
+        code: dropoff_deadline_too_early
+        message: The dropoff deadline needs to be at least 20 minutes after the dropoff
+          ready time.
+        kind: error
+    dropoff_deadline_before_pickup_deadline:
+      value:
+        code: dropoff_deadline_before_pickup_deadline
+        message: The dropoff deadline needs to be after the pickup deadline.
+        kind: error
+    dropoff_ready_after_pickup_deadline:
+      value:
+        code: dropoff_ready_after_pickup_deadline
+        message: The dropoff ready time needs to be at or before the pickup deadline.
+        kind: error
+    pickup_ready_too_early:
+      value:
+        code: pickup_ready_too_early
+        message: The pickup ready time cannot be in the past.
+        kind: error
+    pickup_deadline_too_early:
+      value:
+        code: pickup_deadline_too_early
+        message: The pickup deadline time needs to be at least 20 minutes from now.
+        kind: error
+    pickup_ready_too_late:
+      value:
+        code: pickup_ready_too_late
+        message: The pickup ready time needs to be within the next 30 days.
+        kind: error
+    invalid_params:
+      value:
+        code: invalid_params
+        message: The parameters of your request were invalid.
+        kind: error
+    invalid_params_fields_cannot_be_updated:
+      value:
+        code: invalid_params
+        message: The parameters of your request were invalid.
+        kind: error
+        metadata:
+          { 'param_details': 'The provided fields cannot be updated in the current job state.' }
+    invalid_params_cannot_determine_pickup_address:
+      value:
+        code: invalid_params
+        message: The parameters of your request were invalid.
+        kind: error
+        metadata: { 'param_details': 'cannot determine pickup address' }
+    invalid_params_dropoff_phone_number_is_not_valid:
+      value:
+        code: invalid_params
+        message: The parameters of your request were invalid.
+        kind: error
+        metadata: { 'dropoff_phone_number': 'dropoff phone number is not valid.' }
+    invalid_params_dropoff_ready_time_needs_10_mins_from_now:
+      value:
+        code: invalid_params
+        message: The parameters of your request were invalid.
+        kind: error
+        metadata:
+          { 'param_details': 'The dropoff ready time needs to be at least 10 minutes from now.' }
+    invalid_params_address_geocoding_failed:
+      value:
+        code: invalid_params
+        message: The parameters of your request were invalid.
+        kind: error
+        metadata: { 'param_details': 'unable to resolve provided address through geocoding' }
+    invalid_params_long_lat_too_far:
+      value:
+        code: invalid_params
+        message: The parameters of your request were invalid.
+        kind: error
+        metadata: { 'param_details': 'Pickup Address and provided Long/Lat distance too far' }
+    invalid_params_invalid_restaurant_gateway:
+      value:
+        code: invalid_params
+        message: The parameters of your request were invalid.
+        kind: error
+        metadata: { 'param_details': 'Invalid restaurant gateway request' }
+    invalid_params_pickup_phone_number_is_not_valid:
+      value:
+        code: invalid_params
+        message: The parameters of your request were invalid.
+        kind: error
+        metadata: { 'pickup_phone_number': 'pickup phone number is not valid.' }
+    invalid_params_no_geocoding_result_found:
+      value:
+        code: invalid_params
+        message: The parameters of your request were invalid.
+        kind: error
+        metadata: { 'param_details': 'No geocoding result found' }
+    invalid_params_invalid_pickup_location:
+      value:
+        code: invalid_params
+        message: The parameters of your request were invalid.
+        kind: error
+        metadata: { 'param_details': 'invalid pickup location' }
+    invalid_params_address_is_required:
+      value:
+        code: invalid_params
+        message: The parameters of your request were invalid.
+        kind: error
+        metadata: { 'address': 'This field is required.' }
+    invalid_params_delivery_location_changed:
+      value:
+        code: invalid_params
+        message: The parameters of your request were invalid.
+        kind: error
+        metadata: { 'param_details': 'delivery location changed' }
+    invalid_params_dropoff_ready_time_needs_29_mins_from_now:
+      value:
+        code: invalid_params
+        message: The parameters of your request were invalid.
+        kind: error
+        metadata:
+          { 'param_details': 'The dropoff ready time needs to be at least 29 minutes from now.' }
+    max_tip_exceeded:
+      value:
+        code: max_tip_exceeded
+        message: Max tip exceeded.
+        kind: error
+    tip_already_recorded_error:
+      value:
+        code: tip_already_recorded_error
+        message: Tip already updated.
+        kind: error
+    no_tip:
+      value:
+        code: no_tip
+        message: no_tip.
+        kind: error
+    invalid_tipping_state:
+      value:
+        code: invalid_tipping_state
+        message: Tip cannot be updated in the current job state.
+        kind: error
+    customer_not_found:
+      value:
+        code: customer_not_found
+        message: Customer does not exist.
+        kind: error
+    request_timeout:
+      value:
+        code: request_timeout
+        message: The request timed out…
+        kind: error
+    customer_suspended:
+      value:
+        code: customer_suspended
+        message: Your account is passed due. Payment is required.
+        kind: error
+    address_undeliverable_limited_couriers:
+      value:
+        code: address_undeliverable_limited_couriers
+        message: The specified location is not in a deliverable area at this time
+          because all couriers are currently busy.
+        kind: error
+    expired_quote:
+      value:
+        code: expired_quote
+        message: The price quote specified has expired.
+        kind: error
+    used_quote:
+      value:
+        code: used_quote
+        message: The price quote specified has been used.
+        kind: error
+    missing_payment:
+      value:
+        code: missing_payment
+        message: organization has no billing policy
+        kind: error
+    unauthorized:
+      value:
+        code: unauthorized
+        message: Invalid OAuth 2.0 credentials provided.
+    not_allowed:
+      value:
+        code: not_allowed
+        message: The parameters of your request were invalid.
+        kind: error
+    mismatched_price_quote:
+      value:
+        code: mismatched_price_quote
+        message: Quote mismatch, please recreate the quote.
+        kind: error
+    customer_blocked:
+      value:
+        code: customer_blocked
+        message: Your account is not allowed to create deliveries.
+        kind: error
+    duplicate_delivery:
+      value:
+        code: duplicate_delivery
+        message: An active delivery like this already exists.
+        kind: error
+        metadata: { 'delivery_id': 'del_4y-aAymET6KH9TGTJ-ydxx' }
+    customer_limited:
+      value:
+        code: customer_limited
+        message: Your account’s limits have been exceeded.
+        kind: error
+    internal_server_error:
+      value:
+        code: internal_server_error
+        message: We have experienced a problem.
+    unknown_error:
+      value:
+        code: unknown_error
+        message: Internal server error
+        kind: error
+    couriers_busy:
+      value:
+        code: couriers_busy
+        message: All of our couriers are currently busy.
+        kind: error
+    robo_couriers_busy:
+      value:
+        code: robo_couriers_busy
+        message: All of our robo couriers are currently busy.
+        kind: error
+    noncancelable_delivery:
+      value:
+        code: noncancelable_delivery
+        message: Delivery cannot be cancelled
+        kind: error
+    delivery_not_found:
+      value:
+        code: delivery_not_found
+        message: The requested delivery does not exist.
+        kind: error
+    service_unavailable:
+      value:
+        code: service_unavailable
+        message: Service is currently unavailable.
+        kind: error
+    POD_delivery_not_found:
+      value:
+        code: service_unavailable
+        message: Service is currently unavailable.
+        kind: error
+  securitySchemes:
+    direct_auth:
+      type: oauth2
+      flows:
+        clientCredentials:
+          tokenUrl: https://auth.uber.com/oauth/v2/token
+          scopes:
+            eats.deliveries: Unique scope for Uber Direct deliveries
+  codeSamples:
+    quoteCurl: |
+      # Replace {customer_id} and {token} in the code block below with your specific values.
+      # Note that this code snippet is a sample and does not include all the fields.
+
+      curl -X POST 'https://api.uber.com/v1/customers/{customer_id}/delivery_quotes' \
+      -H 'Content-Type: application/json' \
+      -H 'Authorization: Bearer {token}' \
+      -d '{
+        "pickup_address": "{\"street_address\":[\"100 Maiden Ln\"],\"city\":\"New York\",\"state\":\"NY\",\"zip_code\":\"10023\",\"country\":\"US\"}",
+        "dropoff_address": "{\"street_address\":[\"30 Lincoln Center Plaza\"],\"city\":\"New York\",\"state\":\"NY\",\"zip_code\":\"10023\",\"country\":\"US\"}",
+        "pickup_latitude": 40.7066581,
+        "pickup_longitude": -74.0071868,
+        "dropoff_latitude": 38.9298375,
+        "dropoff_longitude": -77.0582303,
+        "pickup_phone_number": "+15555555555",
+        "dropoff_phone_number": "+15555555555",
+        "manifest_total_value": 1000,
+        "external_store_id": "my_store_123"
+        }'
+    quoteJavaScript: |
+      // Replace {customer_id} and {token} in the code block below with your specific values.
+      // Note that this code snippet is a sample and does not include all the fields.
+
+      const url = 'https://api.uber.com/v1/customers/{customer_id}/delivery_quotes';
+      const headers = {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer {token}'
+      };
+
+      const data = {
+          "pickup_address": "{\"street_address\":[\"100 Maiden Ln\"],\"city\":\"New York\",\"state\":\"NY\",\"zip_code\":\"10023\",\"country\":\"US\"}",
+          "dropoff_address": "{\"street_address\":[\"30 Lincoln Center Plaza\"],\"city\":\"New York\",\"state\":\"NY\",\"zip_code\":\"10023\",\"country\":\"US\"}",
+          "pickup_latitude": 40.7066581,
+          "pickup_longitude": -74.0071868,
+          "dropoff_latitude": 38.9298375,
+          "dropoff_longitude": -77.0582303,
+          "pickup_phone_number": "+15555555555",
+          "dropoff_phone_number": "+15555555555",
+          "manifest_total_value": 1000,
+          "external_store_id": "my_store_123"
+      };
+
+      fetch(url, {
+          method: 'POST',
+          headers: headers,
+          body: JSON.stringify(data)
+      });
+    quotePython: |
+      # Replace {customer_id} and {token} in the code block below with your specific values.
+      # Note that this code snippet is a sample and does not include all the fields.
+
+      import requests
+
+      url = 'https://api.uber.com/v1/customers/{customer_id}/delivery_quotes'
+      headers = {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer {token}'
+      }
+
+      data = {
+          "pickup_address": "{\"street_address\":[\"100 Maiden Ln\"],\"city\":\"New York\",\"state\":\"NY\",\"zip_code\":\"10023\",\"country\":\"US\"}",
+          "dropoff_address": "{\"street_address\":[\"30 Lincoln Center Plaza\"],\"city\":\"New York\",\"state\":\"NY\",\"zip_code\":\"10023\",\"country\":\"US\"}",
+          "pickup_latitude": 40.7066581,
+          "pickup_longitude": -74.0071868,
+          "dropoff_latitude": 38.9298375,
+          "dropoff_longitude": -77.0582303,
+          "pickup_phone_number": "+15555555555",
+          "dropoff_phone_number": "+15555555555",
+          "manifest_total_value": 1000,
+          "external_store_id": "my_store_123"
+      }
+
+      response = requests.post(url, headers=headers, json=data)
+    deliveryCurl: |
+      # Replace {customer_id} and {token} in the code block below with your specific values.
+      # Note that this code snippet is a sample and does not include all the fields.
+
+      curl -X POST 'https://api.uber.com/v1/customers/{customer_id}/deliveries' \
+      -H 'Content-Type: application/json' \
+      -H 'Authorization: Bearer {token}' \
+      -d '{
+        "quote_id": "dqt_6gQ2dt31TjiOPfwux-NCXg",
+        "pickup_name": "Store Name",
+        "pickup_address": "{\"street_address\":[\"100 Maiden Ln\"],\"city\":\"New York\",\"state\":\"NY\",\"zip_code\":\"10023\",\"country\":\"US\"}",
+        "pickup_phone_number": "+15555555555",
+        "dropoff_name": "Gordon Shumway",
+        "dropoff_address": "{\"street_address\":[\"30 Lincoln Center Plaza\"],\"city\":\"New York\",\"state\":\"NY\",\"zip_code\":\"10023\",\"country\":\"US\"}",
+        "dropoff_phone_number": "+15555555555",
+        "manifest_items": [
+          {
+            "name": "Bow tie",
+            "quantity": 1,
+            "size": "small",
+            "dimensions": {
+              "length": 20,
+              "height": 20,
+              "depth": 20
+            },
+            "price": 100,
+            "must_be_upright": false,
+            "weight": 300
+          }
+        ],
+        "pickup_business_name": "Store Name",
+        "pickup_latitude": 40.7066745,
+        "pickup_longitude": -74.0071976,
+        "pickup_notes": "Follow big green 'Pickup' signs in the parking lot",
+        "pickup_verification": {
+          "signature_requirement": {
+            "enabled": true,
+            "collect_signer_name": true,
+            "collect_signer_relationship": true
+          },
+          "picture": true
+        },
+        "dropoff_business_name": "House of Luciano",
+        "dropoff_latitude": 40.7727076,
+        "dropoff_longitude": -73.9839082,
+        "dropoff_notes": "Second floor, black door to the right.",
+        "dropoff_seller_notes": "Fragile content - please handle the box with care during delivery.",
+        "dropoff_verification": {
+          "signature_requirement": {
+            "enabled": true,
+            "collect_signer_name": true,
+            "collect_signer_relationship": true
+          },
+          "barcodes": [
+            {
+              "value": "string",
+              "type": "CODE39"
+            }
+          ]
+        },
+        "deliverable_action": "deliverable_action_meet_at_door",
+        "manifest_reference": "REF0000002",
+        "manifest_total_value": 1000,
+        "idempotency_key": "1234567890",
+        "external_store_id": "my_store_123",
+        "return_verification": {
+          "picture": true
+        },
+        "external_id": "1234567890"
+      }'
+    deliveryJavaScript: |
+      // Replace {customer_id}, {token}, {quote_id}, and {idempotency_key} in the code block below with your specific values.
+      // Note that this code snippet is a sample and does not include all the fields.
+
+      const url = 'https://api.uber.com/v1/customers/{customer_id}/deliveries';
+      const headers = {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer {token}'
+      };
+
+      const data = {
+          "quote_id": "{quote_id}",
+          "pickup_name": "Store Name",
+          "pickup_address": "{\"street_address\":[\"100 Maiden Ln\"],\"city\":\"New York\",\"state\":\"NY\",\"zip_code\":\"10023\",\"country\":\"US\"}",
+          "pickup_phone_number": "+15555555555",
+          "dropoff_name": "Gordon Shumway",
+          "dropoff_address": "{\"street_address\":[\"30 Lincoln Center Plaza\"],\"city\":\"New York\",\"state\":\"NY\",\"zip_code\":\"10023\",\"country\":\"US\"}",
+          "dropoff_phone_number": "+15555555555",
+          "manifest_items": [
+            {
+              "name": "Bow tie",
+              "quantity": 1,
+              "size": "small",
+              "dimensions": {
+                "length": 20,
+                "height": 20,
+                "depth": 20
+              },
+              "price": 100,
+              "must_be_upright": false,
+              "weight": 300
+            }
+          ],
+          "pickup_business_name": "Store Name",
+          "pickup_latitude": 40.7066745,
+          "pickup_longitude": -74.0071976,
+          "pickup_notes": "Follow big green 'Pickup' signs in the parking lot",
+          "pickup_verification": {
+            "signature_requirement": {
+              "enabled": true,
+              "collect_signer_name": true,
+              "collect_signer_relationship": true
+            },
+            "picture": true
+          },
+          "dropoff_business_name": "House of Luciano",
+          "dropoff_latitude": 40.7727076,
+          "dropoff_longitude": -73.9839082,
+          "dropoff_notes": "Second floor, black door to the right.",
+          "dropoff_seller_notes": "Fragile content - please handle the box with care during delivery.",
+          "dropoff_verification": {
+            "signature_requirement": {
+              "enabled": true,
+              "collect_signer_name": true,
+              "collect_signer_relationship": true
+            },
+            "barcodes": [
+              {
+                "value": "string",
+                "type": "CODE39"
+              }
+            ]
+          },
+          "deliverable_action": "deliverable_action_meet_at_door",
+          "manifest_reference": "REF0000002",
+          "manifest_total_value": 1000,
+          "idempotency_key": "{idempotency_key}",
+          "external_store_id": "my_store_123",
+          "return_verification": {
+            "picture": true
+          },
+          "external_id": "1234567890"
+      };
+
+      fetch(url, {
+          method: 'POST',
+          headers: headers,
+          body: JSON.stringify(data)
+      });
+    deliveryPython: |
+      # Replace {customer_id}, {token}, {quote_id}, and {idempotency_key} in the code block below with your specific values.
+      # Note that this code snippet is a sample and does not include all the fields.
+
+      import requests
+
+      url = 'https://api.uber.com/v1/customers/{customer_id}/deliveries'
+      headers = {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer {token}'
+      }
+
+      data = {
+          "quote_id": "{quote_id}",
+          "pickup_name": "Store Name",
+          "pickup_address": "{\"street_address\":[\"100 Maiden Ln\"],\"city\":\"New York\",\"state\":\"NY\",\"zip_code\":\"10023\",\"country\":\"US\"}",
+          "pickup_phone_number": "+15555555555",
+          "dropoff_name": "Gordon Shumway",
+          "dropoff_address": "{\"street_address\":[\"30 Lincoln Center Plaza\"],\"city\":\"New York\",\"state\":\"NY\",\"zip_code\":\"10023\",\"country\":\"US\"}",
+          "dropoff_phone_number": "+15555555555",
+          "manifest_items": [
+            {
+              "name": "Bow tie",
+              "quantity": 1,
+              "size": "small",
+              "dimensions": {
+                "length": 20,
+                "height": 20,
+                "depth": 20
+              },
+              "price": 100,
+              "must_be_upright": False,
+              "weight": 300
+            }
+          ],
+          "pickup_business_name": "Store Name",
+          "pickup_latitude": 40.7066745,
+          "pickup_longitude": -74.0071976,
+          "pickup_notes": "Follow big green 'Pickup' signs in the parking lot",
+          "pickup_verification": {
+            "signature_requirement": {
+              "enabled": True,
+              "collect_signer_name": True,
+              "collect_signer_relationship": True
+            },
+            "picture": True
+          },
+          "dropoff_business_name": "House of Luciano",
+          "dropoff_latitude": 40.7727076,
+          "dropoff_longitude": -73.9839082,
+          "dropoff_notes": "Second floor, black door to the right.",
+          "dropoff_seller_notes": "Fragile content - please handle the box with care during delivery.",
+          "dropoff_verification": {
+            "signature_requirement": {
+              "enabled": True,
+              "collect_signer_name": True,
+              "collect_signer_relationship": True
+            },
+            "barcodes": [
+              {
+                "value": "string",
+                "type": "CODE39"
+              }
+            ]
+          },
+          "deliverable_action": "deliverable_action_meet_at_door",
+          "manifest_reference": "REF0000002",
+          "manifest_total_value": 1000,
+          "idempotency_key": "{idempotency_key}",
+          "external_store_id": "my_store_123",
+          "return_verification": {
+            "picture": True
+          },
+          "external_id": "1234567890"
+      }
+
+      response = requests.post(url, headers=headers, json=data)
+    listDeliveryCurl: |
+      # Replace {customer_id} and {token} in the code block below with your specific values.
+      # Note that this code snippet is a sample and does not include all the fields.
+
+      curl -X GET 'https://api.uber.com/v1/customers/{customer_id}/deliveries' \
+      -H 'Content-Type: application/json' \
+      -H 'Authorization: Bearer {token}' \
+
+    listDeliveryJavaScript: |
+      // Replace {customer_id} and {token} in the code block below with your specific values.
+      // Note that this code snippet is a sample and does not include all the fields.
+
+      const url = 'https://api.uber.com/v1/customers/{customer_id}/deliveries';
+      const headers = {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer {token}'
+      };
+
+      fetch(url, {
+          method: 'GET',
+          headers: headers
+      });
+    listDeliveryPython: |
+      # Replace {customer_id} and {token} in the code block below with your specific values.
+      # Note that this code snippet is a sample and does not include all the fields.
+
+      import requests
+
+      url = 'https://api.uber.com/v1/customers/{customer_id}/deliveries'
+      headers = {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer {token}'
+      }
+
+      response = requests.get(url, headers=headers)
+    updateDeliveryCurl: |
+      # Replace {customer_id}, {token}, and {delivery_id} in the code block below with your specific values.
+      # Note that this code snippet is a sample and does not include all the fields.
+
+      curl -X POST 'https://api.uber.com/v1/customers/{customer_id}/deliveries/{delivery_id}' \
+      -H 'Content-Type: application/json' \
+      -H 'Authorization: Bearer {token}' \
+      -d '{
+        "dropoff_notes": "Second floor, black door to the right.",
+        "dropoff_seller_notes": "Fragile content - please handle the box with care during delivery.",
+        "manifest_reference": "REF0000002",
+        "pickup_notes": "Follow big green 'Pickup' signs in the parking lot",
+        "dropoff_verification": {
+          "barcodes": [
+            {
+              "value": "W1129082649-1",
+              "type": "CODE39"
+            }
+          ]
+        },
+        "tip_by_customer": 500
+      }'
+
+    updateDeliveryJavaScript: |
+      // Replace {customer_id}, {token}, and {delivery_id} in the code block below with your specific values.
+      // Note that this code snippet is a sample and does not include all the fields.
+
+      const url = 'https://api.uber.com/v1/customers/{customer_id}/deliveries/{delivery_id}';
+      const headers = {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer {token}'
+      };
+
+      const data = {
+          "dropoff_notes": "Second floor, black door to the right.",
+          "dropoff_seller_notes": "Fragile content - please handle the box with care during delivery.",
+          "manifest_reference": "REF0000002",
+          "pickup_notes": "Follow big green 'Pickup' signs in the parking lot",
+          "dropoff_verification": {
+              "barcodes": [
+                  {
+                      "value": "W1129082649-1",
+                      "type": "CODE39"
+                  }
+              ]
+          },
+          "tip_by_customer": 500
+      };
+
+      fetch(url, {
+          method: 'POST',
+          headers: headers,
+          body: JSON.stringify(data)
+      });
+    updateDeliveryPython: |
+      # Replace {customer_id}, {token}, and {delivery_id} in the code block below with your specific values.
+      # Note that this code snippet is a sample and does not include all the fields.
+
+      import requests
+
+      url = 'https://api.uber.com/v1/customers/{customer_id}/deliveries/{delivery_id}'
+      headers = {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer {token}'
+      }
+
+      data = {
+          "dropoff_notes": "Second floor, black door to the right.",
+          "dropoff_seller_notes": "Fragile content - please handle the box with care during delivery.",
+          "manifest_reference": "REF0000002",
+          "pickup_notes": "Follow big green 'Pickup' signs in the parking lot",
+          "dropoff_verification": {
+              "barcodes": [
+                  {
+                      "value": "W1129082649-1",
+                      "type": "CODE39"
+                  }
+              ]
+          },
+          "tip_by_customer": 500
+      }
+
+      response = requests.post(url, headers=headers, json=data)
+    getDeliveryCurl: |
+      # Replace {customer_id}, {token}, and {delivery_id} in the code block below with your specific values.
+      # Note that this code snippet is a sample and does not include all the fields.
+
+      curl -X GET 'https://api.uber.com/v1/customers/{customer_id}/deliveries/{delivery_id}' \
+      -H 'Content-Type: application/json' \
+      -H 'Authorization: Bearer {token}' \
+
+    getDeliveryJavaScript: |
+      // Replace {customer_id}, {token}, and {delivery_id} in the code block below with your specific values.
+      // Note that this code snippet is a sample and does not include all the fields.
+
+      const url = 'https://api.uber.com/v1/customers/{customer_id}/deliveries/{delivery_id}';
+      const headers = {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer {token}'
+      };
+
+      fetch(url, {
+          method: 'GET',
+          headers: headers
+      });
+    getDeliveryPython: |
+      # Replace {customer_id}, {token}, and {delivery_id} in the code block below with your specific values.
+      # Note that this code snippet is a sample and does not include all the fields.
+
+      import requests
+
+      url = 'https://api.uber.com/v1/customers/{customer_id}/deliveries/{delivery_id}'
+      headers = {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer {token}'
+      }
+
+      response = requests.get(url, headers=headers)
+    cancelDeliveryCurl: |
+      # Replace {customer_id}, {token}, and {delivery_id} in the code block below with your specific values.
+      # Note that this code snippet is a sample and does not include all the fields.
+
+      curl -X POST 'https://api.uber.com/v1/customers/{customer_id}/deliveries/{delivery_id}/cancel' \
+      -H 'Content-Type: application/json' \
+      -H 'Authorization: Bearer {token}' \
+
+    cancelDeliveryJavaScript: |
+      // Replace {customer_id}, {token}, and {delivery_id} in the code block below with your specific values.
+      // Note that this code snippet is a sample and does not include all the fields.
+
+      const url = 'https://api.uber.com/v1/customers/{customer_id}/deliveries/{delivery_id}/cancel';
+      const headers = {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer {token}'
+      };
+
+      fetch(url, {
+          method: 'POST',
+          headers: headers,
+          body: JSON.stringify(data)
+      });
+    cancelDeliveryPython: |
+      # Replace {customer_id}, {token}, and {delivery_id} in the code block below with your specific values.
+      # Note that this code snippet is a sample and does not include all the fields.
+
+      import requests
+
+      url = 'https://api.uber.com/v1/customers/{customer_id}/deliveries/{delivery_id}/cancel'
+      headers = {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer {token}'
+      }
+
+      response = requests.post(url, headers=headers)
+    podCurl: |
+      # Replace {customer_id}, {token}, and {delivery_id} in the code block below with your specific values.
+      # Note that this code snippet is a sample and does not include all the fields.
+
+      curl -X POST 'https://api.uber.com/v1/customers/{customer_id}/deliveries/{delivery_id}/proof-of-delivery' \
+      -H 'Content-Type: application/json' \
+      -H 'Authorization: Bearer {token}' \
+      -d '{
+            "waypoint": "dropoff",
+            "type": "picture"
+            }'
+
+    podJavaScript: |
+      // Replace {customer_id}, {token}, and {delivery_id} in the code block below with your specific values.
+      // Note that this code snippet is a sample and does not include all the fields.
+
+      const url = 'https://api.uber.com/v1/customers/{customer_id}/deliveries/{delivery_id}/proof-of-delivery';
+      const headers = {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer {token}'
+      };
+
+      const data = {
+          "waypoint": "dropoff",
+          "type": "picture"
+      };
+
+      fetch(url, {
+          method: 'POST',
+          headers: headers,
+          body: JSON.stringify(data)
+      });
+    podPython: |
+      # Replace {customer_id}, {token}, and {delivery_id} in the code block below with your specific values.
+      # Note that this code snippet is a sample and does not include all the fields.
+
+      import requests
+
+      url = 'https://api.uber.com/v1/customers/{customer_id}/deliveries/{delivery_id}/proof-of-delivery'
+      headers = {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer {token}'
+      }
+
+      data = {
+          "waypoint": "dropoff",
+          "type": "picture"
+      }
+
+      response = requests.post(url, headers=headers, json=data)

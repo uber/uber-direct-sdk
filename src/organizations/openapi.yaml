@@ -1,0 +1,708 @@
+openapi: 3.0.3
+info:
+  version: 1.0.1
+  title: Organizations API
+  description: |
+    Uber's Organization API enables merchants to create and manage sub-organizations nested below their given root organization.
+
+    Authorization requires the `direct.organizations` scope.
+servers:
+  - url: https://api.uber.com/v1/direct/
+components:
+  codeSamples:
+    createOrgPython: |
+        # Replace {token} in the code block below with your specific values.
+        # Note that this code snippet is a sample and does not include all the fields.
+
+        import requests
+
+        url = 'https://api.uber.com/v1/direct/organizations'
+        headers = {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer {token}'
+        }
+
+        data = {
+            "info": {
+                "name": "Sample Sub-Org Name",
+                "billing_type": "BILLING_TYPE_CENTRALIZED",
+                "merchant_type": "MERCHANT_TYPE_RESTAURANT",
+                "point_of_contact": {
+                    "email": "name@email.com",
+                    "phone_details": {
+                        "phone_number": "15555555555",
+                        "country_code": "1",
+                        "subscriber_number": "5555555555"
+                    }
+                },
+                "address": {
+                    "street1": "2000 Tustin Ave",
+                    "street2": "",
+                    "city": "Irvine",
+                    "state": "CA",
+                    "zipcode": "92602",
+                    "country_iso2": "US"
+                }
+            },
+            "hierarchy_info": {
+                "parent_organization_id": "a11e6f29-6850-4d8d-b88d-0ae69cec1111"
+            },
+            "options": {
+                "onboarding_invite_type": "ONBOARDING_INVITE_TYPE_INVALID"
+            }
+        }
+
+        response = requests.post(url, headers=headers, json=data)
+    createOrgJavascript: |
+      // Replace {token} in the code block below with your specific values.
+      // Note that this code snippet is a sample and does not include all the fields.
+
+      const url = 'https://api.uber.com/v1/direct/organizations';
+      const headers = {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer {token}'
+      };
+
+      const data = {
+          "info": {
+              "name": "Sample Sub-Org Name",
+              "billing_type": "BILLING_TYPE_CENTRALIZED",
+              "merchant_type": "MERCHANT_TYPE_RESTAURANT",
+              "point_of_contact": {
+                  "email": "name@email.com",
+                  "phone_details": {
+                      "phone_number": "15555555555",
+                      "country_code": "1",
+                      "subscriber_number": "5555555555"
+                  }
+              },
+              "address": {
+                  "street1": "2000 Tustin Ave",
+                  "street2": "",
+                  "city": "Irvine",
+                  "state": "CA",
+                  "zipcode": "92602",
+                  "country_iso2": "US"
+              }
+          },
+          "hierarchy_info": {
+              "parent_organization_id": "a11e6f29-6850-4d8d-b88d-0ae69cec1111"
+          },
+          "options": {
+              "onboarding_invite_type": "ONBOARDING_INVITE_TYPE_INVALID"
+          }
+      };
+
+      fetch(url, {
+          method: 'POST',
+          headers: headers,
+          body: JSON.stringify(data)
+      });
+    createOrgCurl: |
+      # Replace {token} in the code block below with your specific values.
+      # Note that this code snippet is a sample and does not include all the fields.
+
+      curl -X POST 'https://api.uber.com/v1/direct/organizations' \
+      -H 'Content-Type: application/json' \
+      -H 'Authorization: Bearer {token}' \
+      -d '{
+        "info": {
+            "name": "Sample Sub-Org Name",
+            "billing_type": "BILLING_TYPE_CENTRALIZED",
+            "merchant_type": "MERCHANT_TYPE_RESTAURANT",
+            "point_of_contact": {
+                "email": "name@email.com",
+                "phone_details": {
+                    "phone_number": "15555555555",
+                    "country_code": "1",
+                    "subscriber_number": "5555555555"
+                }
+            },
+            "address": {
+                "street1": "2000 Tustin Ave",
+                "street2": "",
+                "city": "Irvine",
+                "state": "CA",
+                "zipcode": "92602",
+                "country_iso2": "US"
+            }
+        },
+        "hierarchy_info": {
+            "parent_organization_id": "a11e6f29-6850-4d8d-b88d-0ae69cec1111"
+        },
+        "options": {
+            "onboarding_invite_type": "ONBOARDING_INVITE_TYPE_INVALID"
+        }
+      }'
+    getOrgPython: |
+      # Replace {token} and {organization_id} in the code block below with your specific values.
+      # Note that this code snippet is a sample and does not include all the fields.
+
+      import requests
+
+      url = 'https://api.uber.com/v1/direct/organizations/{organization_id}'
+      headers = {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer {token}'
+      }
+
+      response = requests.get(url, headers=headers)
+    getOrgJavascript: |
+      // Replace {token} and {organization_id} in the code block below with your specific values.
+      // Note that this code snippet is a sample and does not include all the fields.
+
+      const url = 'https://api.uber.com/v1/direct/organizations/{organization_id}';
+      const headers = {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer {token}'
+      };
+
+      fetch(url, {
+          method: 'GET',
+          headers: headers,
+      });
+    getOrgCurl: |
+      # Replace {token} and {organization_id} in the code block below with your specific values.
+      # Note that this code snippet is a sample and does not include all the fields.
+
+      curl -X GET 'https://api.uber.com/v1/direct/organizations/{organization_id}' \
+      -H 'Content-Type: application/json' \
+      -H 'Authorization: Bearer {token}' \
+    inviteNewPython: |
+      # Replace {token} and {organization_id} in the code block below with your specific values.
+      # Note that this code snippet is a sample and does not include all the fields.
+
+      import requests
+
+      url = 'https://api.uber.com/v1/direct/organizations/{organization_id}/memberships/invite'
+      headers = {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer {token}'
+      }
+
+      data = {
+          "user_details": {
+              "email": "john@email.com",
+              "first_name": "John",
+              "last_name": "Smith",
+              "phone_details": {
+                  "phone_number": "15555555555",
+                  "country_code": "1",
+                  "subscriber_number": "5555555555"
+              }
+          },
+          "roles": [
+              "ROLE_ADMIN"
+          ]
+      }
+
+      response = requests.post(url, headers=headers, json=data)
+    inviteNewJavascript: |
+      // Replace {token} and {organization_id} in the code block below with your specific values.
+      // Note that this code snippet is a sample and does not include all the fields.
+
+      const url = 'https://api.uber.com/v1/direct/organizations/{organization_id}/memberships/invite';
+      const headers = {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer {token}'
+      };
+
+      const data = {
+          "user_details": {
+              "email": "john@email.com",
+              "first_name": "John",
+              "last_name": "Smith",
+              "phone_details": {
+                  "phone_number": "15555555555",
+                  "country_code": "1",
+                  "subscriber_number": "5555555555"
+              }
+          },
+          "roles": [
+              "ROLE_ADMIN"
+          ]
+      };
+
+      fetch(url, {
+          method: 'POST',
+          headers: headers,
+          body: JSON.stringify(data)
+      });
+    inviteNewCurl: |
+      # Replace {token} and {organization_id} in the code block below with your specific values.
+      # Note that this code snippet is a sample and does not include all the fields.
+
+      curl -X POST 'https://api.uber.com/v1/direct/organizations/{organization_id}/memberships/invite' \
+      -H 'Content-Type: application/json' \
+      -H 'Authorization: Bearer {token}' \
+      -d '{
+        "user_details": {
+          "email": "john@email.com",
+          "first_name": "John",
+          "last_name": "Smith",
+          "phone_details": {
+            "phone_number": "15555555555",
+            "country_code": "1",
+            "subscriber_number": "5555555555"
+          }
+        },
+        "roles": [
+          "ROLE_ADMIN"
+        ]
+      }'
+  securitySchemes:
+    direct_auth:
+      type: oauth2
+      flows:
+        clientCredentials:
+          tokenUrl: https://auth.uber.com/oauth/v2/token
+          scopes:
+            'direct.organizations': Unique scope for Uber Direct Organizations
+  parameters:
+    organizationId:
+      required: true
+      name: organization_id
+      description: "Unique identifier of an organization represented as UUID. Note: UUID is case-sensitive."
+      in: path
+      schema:
+        type: string
+      example: a11e6f29-6850-4d8d-b88d-0ae69cec1111
+  schemas:
+    CreateOrgReq:
+      type: object
+      properties:
+        info:
+          type: object
+          $ref: '#/components/schemas/OrganizationInfo'
+          description: Information about the organization.
+        hierarchy_info:
+          type: object
+          $ref: '#/components/schemas/HierarchyInfo'
+          description: Organization's hierarchy details.
+        options:
+          type: object
+          $ref: '#/components/schemas/Options'
+    OrganizationInfo:
+      type: object
+      required:
+        - name
+        - billing_type
+      properties:
+        name:
+          type: string
+          description: Business name of the organization.
+          example: Sample Sub-Org Name
+        billing_type:
+          type: object
+          $ref: '#/components/schemas/BillingType'
+          description: Centralized or decentralized.
+        merchant_type:
+          type: string
+          $ref: '#/components/schemas/MerchantType'
+          description: Merchant type of the organization, e.g. Grocery, retail, restaurants
+        point_of_contact:
+          type: object
+          $ref: '#/components/schemas/PointOfContact'
+          description: Contact details of the orgazniation. Communications related to the organization will be sent here.
+
+        address:
+          type: object
+          $ref: '#/components/schemas/Address'
+          description: Required when using `BILLING_TYPE_DECENTRALIZED`.
+    HierarchyInfo:
+      type: object
+      required: parent_organization_id
+      properties:
+        parent_organization_id:
+          type: string
+          description: Parent organization ID. This is the (Root Org) found via the customer_id displayed on the developer dashboard billing.
+          example: 'a11e6f29-6850-4d8d-b88d-0ae69cec1111'
+    Options:
+      type: object
+      description: Object that holds the fields that work as attributes to the CreateOrganization request.
+      properties:
+        onboarding_invite_type:
+          type: object
+          $ref: '#/components/schemas/OnboardingInviteType'
+    OnboardingInviteType:
+      type: string
+      description: |
+        Indicates a webform should be sent to collect billing and tax information. The webform will be sent to the POC specified in the request:
+        | Type | Description |
+        |--------|--------|
+        | ONBOARDING_INVITE_TYPE_INVALID | Reserved value. Indicating no email will be sent. |
+        | ONBOARDING_INVITE_TYPE_EMAIL | Indicating an onboarding webform should be sent via Email.
+      enum:
+        - ONBOARDING_INVITE_TYPE_INVALID
+        - ONBOARDING_INVITE_TYPE_EMAIL
+    MerchantType:
+      type: string
+      description: The organization's business type
+      enum:
+        - MERCHANT_TYPE_RESTAURANT
+        - MERCHANT_TYPE_GROCERY
+        - MERCHANT_TYPE_LIQUOR
+        - MERCHANT_TYPE_RETAIL
+        - MERCHANT_TYPE_ESSENTIALS
+        - MERCHANT_TYPE_PHARMACY
+        - MERCHANT_TYPE_SPECIALTY_FOOD
+        - MERCHANT_TYPE_FLOWER
+        - MERCHANT_TYPE_PET_SUPPLY
+    PointOfContact:
+      type: object
+      properties:
+        email:
+          type: string
+          description: Primary contact for the organization. This email address will be linked to the Org, giving them admin-level access to the organization.
+          example: name@email.com
+        phone_details:
+          type: string
+          $ref: '#/components/schemas/PhoneDetails'
+          description: Phone details of primary contact.
+    PhoneDetails:
+      type: object
+      properties:
+        phone_number:
+          type: string
+          description: Full phone number including country code and subscriber number, e.g. `15555555555`
+          example: '15555555555'
+        country_code:
+          type: string
+          description: "Phone number country code [https://countrycode.org](https://countrycode.org) E.g. `1` for U.S."
+          example: '1'
+        subscriber_number:
+          type: string
+          description: Subscriber phone number E.g. `5555555555`
+          example: '5555555555'
+    BillingType:
+      type: string
+      description: |
+        | Type | Description |
+        |--------|--------|
+        | BILLING_TYPE_CENTRALIZED | Billing type is centralized if the (Root Org/Direct Account) Account is responsible for billing. |
+        | BILLING_TYPE_DECENTRALIZED | Billing type is decentralized if a (child) Org is responsible for their own billing.
+
+        **IMPORTANT:** `BILLING_TYPE_DECENTRALIZED` requires Uber's involvement to set up the billing policy before deliveries can be created.
+      enum:
+        - BILLING_TYPE_CENTRALIZED
+        - BILLING_TYPE_DECENTRALIZED
+    Address:
+      type: object
+      description: Billing address, required in the event of a `BILLING_TYPE_DECENTRALIZED` billing_type.
+      properties:
+        street1:
+          type: string
+          description: The street detail if needed, for example 2000 Tustin Ave.
+          example: '2000 Tustin Ave'
+        street2:
+          type: string
+          description: Additional street detail if needed
+          example: ''
+        city:
+          type: string
+          description: The city detail for the address, for example “Irvine”
+          example: 'Irvine'
+        state:
+          type: string
+          description: The state detail for the address, for example “CA” for California
+          example: 'CA'
+        zipcode:
+          type: string
+          description: The zipcode detail for the address, for example “92602”.
+          example: '92602'
+        country_iso2:
+          type: string
+          description: 'Country code in 2-char ([ISO 3166 alpha2](https://www.iban.com/country-codes)) format.'
+          example: 'US'
+    CreateOrgResp:
+      type: object
+      properties:
+        organization_id:
+          type: string
+          description: Unique identifier of the organization represented as a UUID.
+          example: "a11e6f29-6850-4d8d-b88d-0ae69cec1111"
+        info:
+          type: object
+          $ref: '#/components/schemas/OrganizationInfo'
+          description: Information about the organization.
+        hierarchy_info:
+          type: object
+          $ref: '#/components/schemas/HierarchyInfo'
+          description: Organization's hierarchy details.
+    OrgInviteReq:
+      type: object
+      required:
+        - roles
+      properties:
+        user_details:
+          type: object
+          $ref: '#/components/schemas/UserDetails'
+          description: The new user's information.
+        roles:
+          type: array
+          description: |
+            User roles granted to the newly created user:
+            | Role | Description |
+            |--------|--------|
+            | ROLE_ADMIN  | Administrators have full access to the organization's Direct Dashboard. Includes access to the Billing section, the Developer section, and the ability to add/modify users. |
+            | ROLE_EMPLOYEE | Employees can create deliveries and view past deliveries for the organization. |
+          items:
+            type: string
+            $ref: '#/components/schemas/Role'
+    UserDetails:
+      required:
+        - email
+        - first_name
+        - last_name
+      type: object
+      properties:
+        email:
+          type: string
+          description: E-mail address of the user.
+          example: john@email.com
+        first_name:
+          type: string
+          description: First name of the user.
+          example: John
+        last_name:
+          type: string
+          description: Last name of the user.
+          example: Smith
+        phone_details:
+          type: object
+          $ref: '#/components/schemas/PhoneDetails'
+          descriptipon: Phone contact information.
+    Role:
+      type: string
+      enum:
+        - ROLE_ADMIN
+        - ROLE_EMPLOYEE
+    OrgInviteResp:
+      type: object
+      properties:
+        membership_id:
+          type: string
+          description: Unique identifier as the new user, represented as a UUID.
+          example: "h52ngf31-68f0-5d8d-b88g-0ae69cec9984"
+        organization_id:
+          type: string
+          description: Unique identifier of the organization, represented as a UUID.
+          example: "a11e6f29-6850-4d8d-b88d-0ae69cec1111"
+        user_details:
+          type: object
+          $ref: '#/components/schemas/UserDetails'
+          description: The user's information.
+        roles:
+          type: array
+          items:
+            type: string
+            $ref: '#/components/schemas/Role'
+          description: Roles granted to the newly created user.
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Error
+        code:
+          type: string
+          description: Error code
+        message:
+          type: string
+          description: Error description
+  examples:
+    unauthorized:
+      value:
+        code: "unauthorized"
+        message: "Invalid OAuth 2.0 credentials provided."
+    invalid_params:
+      value:
+        error: "Could not parse json:..."
+    parent_not_root:
+      value:
+        message: "gateway.partnermanager.create_organization gateway error: code:invalid-argument message:parent organization is not a root organization"
+    invalid_parent:
+      value:
+        message: parent_organization_id is invalid
+    invalid_billing:
+      value:
+        message: billing_type is invalid
+    invalid_address:
+      value:
+        message: street1 is required for BILLING_TYPE_DECENTRALIZED
+    invalid_merchant:
+      value:
+        message: merchant_type is invalid
+    not_found:
+      value:
+        message: The requested resource does not exist.
+security:
+  - direct_auth: ['direct.organizations']
+paths:
+  /organizations:
+    post:
+      tags: [Organizations]
+      summary: Create Direct Organizations
+      operationId: "CreateOrg"
+      description: |
+        Create a new sub-organization under the given parent organization ID.
+        - The created organizations will use the same integration credentials as the Direct Account (client_id and client_secret) for authentication.
+        - After a new Org is created, it will be uniquely identified by it's `organization_id` which translates to the `customer_id` parameter in future API requests. Use this UUID in the API requests to create and manage deliveries at the respective Org-level.
+            Example: CreateQuote:  _https://api.uber.com/v1/customers/{customer_id}/deliveries_ replace the `{customer_id}` with the UUID created for the Org.
+        - If you need to update the Org information after it is created, please contact your Uber business contact.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateOrgReq'
+      x-codeSamples:
+        - lang: 'Python'
+          label: 'Python'
+          source:
+            $ref: '#/components/codeSamples/createOrgPython'
+        - lang: 'JavaScript'
+          label: 'JavaScript'
+          source:
+            $ref: '#/components/codeSamples/createOrgJavascript'
+        - lang: 'cURL'
+          label: 'cURL'
+          source:
+            $ref: '#/components/codeSamples/createOrgCurl'
+      responses:
+        "200":
+          description: Sub-organization successfully created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateOrgResp'
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              examples:
+                unauthorized:
+                  $ref: "#/components/examples/unauthorized"
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              examples:
+                invalid_parent:
+                  $ref: "#/components/examples/invalid_parent"
+                parent_not_root:
+                  $ref: "#/components/examples/parent_not_root"
+                invalid_params:
+                  $ref: "#/components/examples/invalid_params"
+                invalid_billing:
+                  $ref: "#/components/examples/invalid_billing"
+                invalid_address:
+                  $ref: "#/components/examples/invalid_address"
+                invalid_merchant:
+                  $ref: "#/components/examples/invalid_merchant"
+      security:
+        - direct_auth: ['direct.organizations']
+  /organizations/{organization_id}:
+    get:
+      tags: [Organizations]
+      operationId: "GetOrg"
+      summary: Get Direct Organization Details
+      description: Fetch information about one specific organization.
+      parameters:
+        - $ref: '#/components/parameters/organizationId'
+      x-codeSamples:
+        - lang: 'Python'
+          label: 'Python'
+          source:
+            $ref: '#/components/codeSamples/getOrgPython'
+        - lang: 'JavaScript'
+          label: 'JavaScript'
+          source:
+            $ref: '#/components/codeSamples/getOrgJavascript'
+        - lang: 'cURL'
+          label: 'cURL'
+          source:
+            $ref: '#/components/codeSamples/getOrgCurl'
+      responses:
+        "200":
+          description: Successfully retrieved organization details.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateOrgResp'
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              examples:
+                unauthorized:
+                  $ref: "#/components/examples/unauthorized"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              examples:
+                not_found:
+                  $ref: "#/components/examples/not_found"
+      security:
+        - direct_auth: ['direct.organizations']
+  /organizations/{organization_id}/memberships/invite:
+    post:
+      tags: [Organizations]
+      summary: Invite New User to Organization
+      operationId: "InviteToOrg"
+      description: Create a new membership in the given organization. The new user will receive an invitation at the e-mail address specified.
+      parameters:
+        - $ref: "#/components/parameters/organizationId"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrgInviteReq'
+      x-codeSamples:
+        - lang: 'Python'
+          label: 'Python'
+          source:
+            $ref: '#/components/codeSamples/inviteNewPython'
+        - lang: 'JavaScript'
+          label: 'JavaScript'
+          source:
+            $ref: '#/components/codeSamples/inviteNewJavascript'
+        - lang: 'cURL'
+          label: 'cURL'
+          source:
+            $ref: '#/components/codeSamples/inviteNewCurl'
+      responses:
+        "200":
+            description: Successfully invited user.
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/OrgInviteResp'
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              examples:
+                unauthorized:
+                  $ref: "#/components/examples/unauthorized"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              examples:
+                not_found:
+                  $ref: "#/components/examples/not_found"
+      security:
+        - direct_auth: ['direct.organizations']
