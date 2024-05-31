@@ -1,0 +1,3 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`inviteMember should handle errors 1`] = `"[object Object]"`;

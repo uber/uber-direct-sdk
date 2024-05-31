@@ -1,0 +1,5 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`proofOfDelivery should handle errors 1`] = `"[object Object]"`;
+
+exports[`proofOfDelivery should throw an error if response.ok is not true 1`] = `"TypeError: response.json is not a function"`;
