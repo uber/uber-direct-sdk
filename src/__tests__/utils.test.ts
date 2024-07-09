@@ -1,4 +1,5 @@
-import { FetchError, fetchData } from '../utils';
+import { version } from '../../package.json';
+import { FetchError, fetchData, getUserAgent } from '../utils';
 
 jest.mock('node-fetch', () => jest.fn());
 
@@ -30,6 +31,7 @@ describe('fetchData', () => {
       headers: {
         Authorization: `Bearer ${accessToken}`,
         'Content-Type': 'application/json',
+        'User-Agent': getUserAgent(),
       },
     });
   });
@@ -57,6 +59,7 @@ describe('fetchData', () => {
       headers: {
         Authorization: `Bearer ${accessToken}`,
         'Content-Type': 'application/json',
+        'User-Agent': getUserAgent(),
       },
       body: JSON.stringify(req),
     });
@@ -110,5 +113,14 @@ describe('fetchData', () => {
       const expectedError = new Error('Error: Failed to fetch data');
       expect(expectedError).toEqual(error);
     }
+  });
+});
+
+describe('getUserAgent', () => {
+  it('should include Uber Direct JS SDK, package version, and node version', () => {
+    const userAgent = getUserAgent();
+    expect(userAgent).toEqual(
+      `Uber Direct JS SDK/${version} (Node.js ${process.version})`
+    );
   });
 });
