@@ -1,10 +1,11 @@
-import { Error } from "./deliveries/types";
+import { version } from '../package.json';
+import { Error } from './deliveries/types';
 
 type Headers = {
   Authorization: string;
   'Content-Type'?: string;
+  'User-Agent': string;
 };
-
 
 type ApiError = {
   code?: string;
@@ -12,14 +13,19 @@ type ApiError = {
   kind?: string;
   metadata?: Record<string, unknown>;
   status?: number;
-}
+};
 
 export class FetchError extends Error {
   public status: number;
   public code?: string;
   public metadata?: Record<string, unknown>;
 
-  constructor(message: string, status: number, code?: string, metadata?: Record<string, unknown>) {
+  constructor(
+    message: string,
+    status: number,
+    code?: string,
+    metadata?: Record<string, unknown>
+  ) {
     super(message);
     this.status = status;
     this.code = code;
@@ -27,14 +33,21 @@ export class FetchError extends Error {
   }
 }
 
+export const getUserAgent = () => {
+  return `Uber Direct JS SDK/${version} (Node.js ${process.version})`;
+};
+
 const getHeaders = (accessToken: string, method: 'GET' | 'POST'): Headers => {
   const headers: Headers = {
     Authorization: `Bearer ${accessToken}`,
+    // Set the user agent so we can track usage
+    'User-Agent': getUserAgent(),
   };
 
   if (method === 'POST') {
     headers['Content-Type'] = 'application/json';
   }
+
 
   return headers;
 };
@@ -46,7 +59,6 @@ const makeQueryString = (params: Record<string, unknown>) => {
     .join('&');
   return `?${query}`;
 };
-
 
 const fetchData = async <T = any>(
   url: string,
