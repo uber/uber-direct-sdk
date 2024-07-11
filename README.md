@@ -139,7 +139,7 @@ console.log(
 
 See more [examples](https://github.com/mager/uber-direct-js-sdk-examples).
 
-### Create Organization
+#### Create Organization
 
 ```js
 const createOrgReq = {
