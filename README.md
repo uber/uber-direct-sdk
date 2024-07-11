@@ -8,7 +8,7 @@ The Uber Direct Javascript SDK is a zero dependency npm package that allows deve
 - `uber-direct/deliveries` - Enables developers to create and manage deliveries.
 - `uber-direct/organizations` - Enables developers to manage organizations and user memberships.
 
-The SDK is designed to be easy to use and fully documented, with [examples](https://github.com/mager/uber-direct-js-sdk-examples) provided for all the functions.
+The SDK is designed to be easy to use and fully documented, with [examples](https://github.com/uber/uber-direct-sdk-samples) provided for all the functions.
 
 ## Usage
 
@@ -47,7 +47,7 @@ const quoteReq = {
 const quote = await deliveriesClient.createQuote(quoteReq);
 ```
 
-See more [examples](https://github.com/mager/uber-direct-js-sdk-examples).
+See more [examples](https://github.com/uber/uber-direct-sdk-samples).
 
 #### Create Delivery
 
@@ -83,7 +83,7 @@ const delivery = await deliveriesClient.createDelivery(deliveryRequest);
 console.log(`Your delivery ID is: ${delivery.id} (${delivery.tracking_url})`);
 ```
 
-See more [examples](https://github.com/mager/uber-direct-js-sdk-examples).
+See more [examples](https://github.com/uber/uber-direct-sdk-samples).
 
 #### Get Delivery
 
@@ -93,7 +93,7 @@ const delivery = await deliveriesClient.getDelivery(deliveryId);
 console.log(`Your delivery status is: ${delivery.status} (Order ID: ${delivery.tracking_url})`);
 ```
 
-See more [examples](https://github.com/mager/uber-direct-js-sdk-examples).
+See more [examples](https://github.com/uber/uber-direct-sdk-samples).
 
 #### List Deliveries
 
@@ -104,7 +104,7 @@ deliveries.forEach((delivery) => {
 });
 ```
 
-See more [examples](https://github.com/mager/uber-direct-js-sdk-examples).
+See more [examples](https://github.com/uber/uber-direct-sdk-samples).
 
 #### Update Delivery
 
@@ -126,7 +126,7 @@ const delivery = await deliveriesClient.updateDelivery(deliveryId, req);
 console.log(`Your delivery tip is: ${delivery.tip} (Order ID: ${delivery.tracking_url})`);
 ```
 
-See more [examples](https://github.com/mager/uber-direct-js-sdk-examples).
+See more [examples](https://github.com/uber/uber-direct-sdk-samples).
 
 #### Cancel Delivery
 
@@ -137,11 +137,28 @@ console.log(
 );
 ```
 
-See more [examples](https://github.com/mager/uber-direct-js-sdk-examples).
+See more [examples](https://github.com/uber/uber-direct-sdk-samples).
 
-### Create Organization
+#### Create Organization
 
-TODO
+```js
+const createOrgReq = {
+  info: {
+    name: 'Test Organization',
+    billing_type: 'BILLING_TYPE_CENTRALIZED',
+  },
+  hierarchy_info: {
+    parent_organization_id: '4fe73ff8-0c9a-5ca3-aa2f-17ef3a8487d5',
+  },
+  options: {
+    onboarding_invite_type: 'ONBOARDING_INVITE_TYPE_EMAIL',
+  },
+};
+const organization = await organizationsClient.createOrganization(createOrgReq);
+console.log(`Your organization ID is: ${organization.organization_id}`);
+```
+
+See more [examples](https://github.com/uber/uber-direct-sdk-samples).
 
 #### Error Handling
 
