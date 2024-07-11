@@ -141,7 +141,24 @@ See more [examples](https://github.com/mager/uber-direct-js-sdk-examples).
 
 ### Create Organization
 
-TODO
+```js
+const createOrgReq = {
+  info: {
+    name: 'Test Organization',
+    billing_type: 'BILLING_TYPE_CENTRALIZED',
+  },
+  hierarchy_info: {
+    parent_organization_id: '4fe73ff8-0c9a-5ca3-aa2f-17ef3a8487d5',
+  },
+  options: {
+    onboarding_invite_type: 'ONBOARDING_INVITE_TYPE_EMAIL',
+  },
+};
+const organization = await organizationsClient.createOrganization(createOrgReq);
+console.log(`Your organization ID is: ${organization.organization_id}`);
+```
+
+See more [examples](https://github.com/mager/uber-direct-js-sdk-examples).
 
 #### Error Handling
 
