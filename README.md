@@ -210,7 +210,7 @@ You should pass in these scopes when requesting an access token (see [Authentica
 
 ### Node
 
-This package has support for Node versions 18 and above. You can install it with `brew` on Mac:
+This package has support for Node versions 18 and above. You can install it with `brew` (Homebrew) on Mac:
 
 ```sh
 brew install node@18
