@@ -32,7 +32,7 @@ describe('getDelivery', () => {
       `${deliveriesClient.baseURL}/deliveries/${deliveryId}`,
       {
         method: 'GET',
-        headers: getExpectedHeaders(accessToken),
+        headers: getExpectedHeaders(accessToken, 'GET'),
       }
     );
     expect(delivery).toEqual(createDeliveryResp);

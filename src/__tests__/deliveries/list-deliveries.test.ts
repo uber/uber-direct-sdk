@@ -27,12 +27,13 @@ describe('listDeliveries', () => {
     });
 
     const resp = await deliveriesClient.listDeliveries();
-
+    console.log(getExpectedHeaders(accessToken, "GET"));
     expect(global.fetch).toHaveBeenCalledWith(
       `${deliveriesClient.baseURL}/deliveries`,
       {
         method: 'GET',
-        headers: getExpectedHeaders(accessToken),
+        headers: getExpectedHeaders(accessToken, 'GET'),
+        body: undefined,
       }
     );
 
@@ -50,7 +51,7 @@ describe('listDeliveries', () => {
       `${deliveriesClient.baseURL}/deliveries?filter=pending&limit=1&Offset=1`,
       {
         method: 'GET',
-        headers: getExpectedHeaders(accessToken),
+        headers: getExpectedHeaders(accessToken, 'GET'),
       }
     );
 

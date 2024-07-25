@@ -31,7 +31,7 @@ describe('getOrganization', () => {
       `${organizationsClient.baseURL}/organizations/${organizationId}`,
       {
         method: 'GET',
-        headers: getExpectedHeaders(accessToken),
+        headers: getExpectedHeaders(accessToken, 'GET'),
       }
     );
     expect(organization).toEqual(createOrgResp);
