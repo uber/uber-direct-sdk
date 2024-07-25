@@ -40,14 +40,12 @@ export const getUserAgent = () => {
 const getHeaders = (accessToken: string, method: 'GET' | 'POST'): Headers => {
   const headers: Headers = {
     Authorization: `Bearer ${accessToken}`,
-    // Set the user agent so we can track usage
     'User-Agent': getUserAgent(),
   };
 
   if (method === 'POST') {
     headers['Content-Type'] = 'application/json';
   }
-
 
   return headers;
 };
@@ -66,10 +64,7 @@ const fetchData = async <T = any>(
   accessToken: string,
   req?: Record<string, unknown>
 ) => {
-  const headers: Record<string, string> = {
-    ...getHeaders(accessToken, method),
-    'Content-Type': 'application/json',
-  };
+  const headers: Record<string, string> = getHeaders(accessToken, method);
 
   const options: RequestInit = {
     method: method,

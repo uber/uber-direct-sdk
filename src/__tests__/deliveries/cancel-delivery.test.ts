@@ -4,8 +4,8 @@ import {
   cancelDeliveryResp,
   accessToken,
   customerId,
-  getExpectedHeaders,
 } from '../../__fixtures__/index';
+import { getHeaders } from '../../utils';
 
 describe('cancelDelivery', () => {
   let deliveriesClient: DeliveriesClient;
@@ -27,12 +27,12 @@ describe('cancelDelivery', () => {
     });
 
     const canceledDelivery = await deliveriesClient.cancelDelivery(deliveryId);
-
+    const method = 'POST';
     expect(global.fetch).toHaveBeenCalledWith(
       `${deliveriesClient.baseURL}/deliveries/${deliveryId}/cancel`,
       {
-        method: 'POST',
-        headers: getExpectedHeaders(accessToken),
+        method,
+        headers: getHeaders(accessToken, method),
       }
     );
     expect(canceledDelivery).toEqual(cancelDeliveryResp);

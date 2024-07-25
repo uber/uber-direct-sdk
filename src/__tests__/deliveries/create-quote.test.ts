@@ -1,4 +1,4 @@
-import { DeliveriesClient, createDeliveriesClient } from '../../deliveries';
+import { DeliveriesClient, createDeliveriesClient } from "../../deliveries";
 import {
   createDeliveryQuoteReq,
   createDeliveryQuoteReqUnstructured,
@@ -7,10 +7,10 @@ import {
   invalidCreateDeliveryQuoteReq,
   accessToken,
   customerId,
-  getExpectedHeaders,
-} from '../../__fixtures__/index';
+} from "../../__fixtures__/index";
+import { getHeaders } from "../../utils";
 
-describe('createQuote', () => {
+describe("createQuote", () => {
   let deliveriesClient: DeliveriesClient;
   beforeEach(() => {
     jest.resetModules();
@@ -23,45 +23,50 @@ describe('createQuote', () => {
     jest.resetAllMocks();
   });
 
-  it('should make a POST request with the required parameters', async () => {
+  it("should make a POST request with the required parameters", async () => {
     global.fetch = jest.fn().mockResolvedValueOnce({
       ok: true,
       json: jest.fn().mockResolvedValueOnce(createDeliveryQuoteResp),
     });
 
-    const deliveryQuote = await deliveriesClient.createQuote(createDeliveryQuoteReq);
-
+    const deliveryQuote = await deliveriesClient.createQuote(
+      createDeliveryQuoteReq
+    );
+    const method = 'POST';
     expect(global.fetch).toHaveBeenCalledWith(
       `${deliveriesClient.baseURL}/delivery_quotes`,
       {
-        method: 'POST',
-        headers: getExpectedHeaders(accessToken),
+        method,
+        headers: getHeaders(accessToken, method),
         body: JSON.stringify(createDeliveryQuoteReq),
       }
     );
     expect(deliveryQuote).toEqual(createDeliveryQuoteResp);
   });
 
-  it('should make a POST request with the unstructured address format', async () => {
+  it("should make a POST request with the unstructured address format", async () => {
     global.fetch = jest.fn().mockResolvedValueOnce({
       ok: true,
       json: jest.fn().mockResolvedValueOnce(createDeliveryQuoteResp),
     });
 
-    const deliveryQuote = await deliveriesClient.createQuote(createDeliveryQuoteReqUnstructured);
+    const deliveryQuote = await deliveriesClient.createQuote(
+      createDeliveryQuoteReqUnstructured
+    );
 
+    const method = 'POST';
     expect(global.fetch).toHaveBeenCalledWith(
       `${deliveriesClient.baseURL}/delivery_quotes`,
       {
-        method: 'POST',
-        headers: getExpectedHeaders(accessToken),
+        method,
+        headers: getHeaders(accessToken, method),
         body: JSON.stringify(createDeliveryQuoteReqUnstructured),
       }
     );
     expect(deliveryQuote).toEqual(createDeliveryQuoteResp);
   });
 
-  it('should make a POST request with the optional parameters', async () => {
+  it("should make a POST request with the optional parameters", async () => {
     global.fetch = jest.fn().mockResolvedValueOnce({
       ok: true,
       json: jest.fn().mockResolvedValueOnce(createDeliveryQuoteResp),
@@ -72,11 +77,12 @@ describe('createQuote', () => {
       ...createDeliveryQuoteReqOptionalFields,
     });
 
+    const method = 'POST';
     expect(global.fetch).toHaveBeenCalledWith(
       `${deliveriesClient.baseURL}/delivery_quotes`,
       {
-        method: 'POST',
-        headers: getExpectedHeaders(accessToken),
+        method,
+        headers: getHeaders(accessToken, method),
         body: JSON.stringify({
           ...createDeliveryQuoteReq,
           ...createDeliveryQuoteReqOptionalFields,
@@ -86,7 +92,7 @@ describe('createQuote', () => {
     expect(deliveryQuote).toEqual(createDeliveryQuoteResp);
   });
 
-  it('should throw an error if response.ok is not true', async () => {
+  it("should throw an error if response.ok is not true", async () => {
     global.fetch = jest.fn().mockResolvedValueOnce({
       ok: false,
     });
@@ -96,15 +102,15 @@ describe('createQuote', () => {
     ).rejects.toThrowErrorMatchingSnapshot();
   });
 
-  it('should handle errors', async () => {
+  it("should handle errors", async () => {
     global.fetch = jest.fn().mockRejectedValueOnce({
       response: {
         data: {
-          code: 'invalid_params',
-          message: 'The parameters of your request were invalid.',
-          kind: 'error',
+          code: "invalid_params",
+          message: "The parameters of your request were invalid.",
+          kind: "error",
           metadata: {
-            pickup_address: 'This field is required.',
+            pickup_address: "This field is required.",
           },
         },
       },

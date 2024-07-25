@@ -1,8 +1,8 @@
 import crypto from 'crypto';
 import { OrganizationsClient, createOrganizationsClient } from '../../organizations';
 import type { BillingType, OnboardingInviteType } from '../../organizations/types';
-import { accessToken, getExpectedHeaders, createOrgResp, organizationId } from '../../__fixtures__';
-
+import { accessToken, createOrgResp, organizationId } from '../../__fixtures__';
+import { getHeaders } from '../../utils';
 
 describe('getOrganization', () => {
   let organizationsClient: OrganizationsClient;
@@ -26,12 +26,12 @@ describe('getOrganization', () => {
 
 
     const organization = await organizationsClient.getOrganization(organizationId);
-
+    const method = 'GET';
     expect(global.fetch).toHaveBeenCalledWith(
       `${organizationsClient.baseURL}/organizations/${organizationId}`,
       {
-        method: 'GET',
-        headers: getExpectedHeaders(accessToken, 'GET'),
+        method,
+        headers: getHeaders(accessToken, method),
       }
     );
     expect(organization).toEqual(createOrgResp);

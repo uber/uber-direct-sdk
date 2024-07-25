@@ -5,8 +5,8 @@ import {
   updateDeliveryResp,
   accessToken,
   customerId,
-  getExpectedHeaders,
 } from '../../__fixtures__/index';
+import { getHeaders } from '../../utils';
 
 describe('updateDelivery', () => {
   let deliveriesClient: DeliveriesClient;
@@ -30,12 +30,12 @@ describe('updateDelivery', () => {
     const updatedDelivery = await deliveriesClient.updateDelivery(deliveryId, {
       ...updateDeliveryReq,
     });
-
+    const method = 'POST';
     expect(global.fetch).toHaveBeenCalledWith(
       `${deliveriesClient.baseURL}/deliveries/${deliveryId}`,
       {
-        method: 'POST',
-        headers: getExpectedHeaders(accessToken),
+        method,
+        headers: getHeaders(accessToken, method),
         body: JSON.stringify(updateDeliveryReq),
       }
     );
