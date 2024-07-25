@@ -1,7 +1,8 @@
 import crypto from 'crypto';
 import { OrganizationsClient, createOrganizationsClient } from '../../organizations';
 import type { BillingType, OnboardingInviteType } from '../../organizations/types';
-import { accessToken, customerId, getExpectedHeaders } from '../../__fixtures__';
+import { accessToken, customerId } from '../../__fixtures__';
+import { getHeaders } from '../../utils';
 
 describe('createOrganization', () => {
   let organizationsClient: OrganizationsClient;
@@ -16,6 +17,7 @@ describe('createOrganization', () => {
   });
 
   it('calls fetchData with the correct arguments', async () => {
+    // TODO: Use fixtures
     const createOrgReq = {
       info: {
         name: 'Test Organization',
@@ -38,12 +40,15 @@ describe('createOrganization', () => {
     });
 
     const resp = await organizationsClient.createOrganization(createOrgReq);
-
-    expect(global.fetch).toHaveBeenCalledWith(`${organizationsClient.baseURL}/organizations`, {
-      method: 'POST',
-      headers: getExpectedHeaders(accessToken),
-      body: JSON.stringify(createOrgReq),
-    });
+    const method = 'POST';
+    expect(global.fetch).toHaveBeenCalledWith(
+      `${organizationsClient.baseURL}/organizations`,
+      {
+        method,
+        headers: getHeaders(accessToken, method),
+        body: JSON.stringify(createOrgReq),
+      }
+    );
     expect(resp).toEqual(createOrgResp);
   });
 

@@ -4,8 +4,8 @@ import {
   listDeliveriesReq,
   accessToken,
   customerId,
-  getExpectedHeaders,
 } from '../../__fixtures__/index';
+import { getHeaders } from '../../utils';
 
 describe('listDeliveries', () => {
   let deliveriesClient: DeliveriesClient;
@@ -27,12 +27,12 @@ describe('listDeliveries', () => {
     });
 
     const resp = await deliveriesClient.listDeliveries();
-    console.log(getExpectedHeaders(accessToken, "GET"));
+    const method = 'GET';
     expect(global.fetch).toHaveBeenCalledWith(
       `${deliveriesClient.baseURL}/deliveries`,
       {
-        method: 'GET',
-        headers: getExpectedHeaders(accessToken, 'GET'),
+        method,
+        headers: getHeaders(accessToken, method),
         body: undefined,
       }
     );
@@ -47,11 +47,12 @@ describe('listDeliveries', () => {
     });
 
     const resp = await deliveriesClient.listDeliveries(listDeliveriesReq);
+    const method = 'GET';
     expect(global.fetch).toHaveBeenCalledWith(
       `${deliveriesClient.baseURL}/deliveries?filter=pending&limit=1&Offset=1`,
       {
-        method: 'GET',
-        headers: getExpectedHeaders(accessToken, 'GET'),
+        method,
+        headers: getHeaders(accessToken, method),
       }
     );
 
