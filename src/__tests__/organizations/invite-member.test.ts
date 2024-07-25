@@ -1,8 +1,8 @@
 import crypto from 'crypto';
 import { OrganizationsClient, createOrganizationsClient } from '../../organizations';
 import type { BillingType, OnboardingInviteType } from '../../organizations/types';
-import { accessToken, getExpectedHeaders, createOrgResp,  organizationId, inviteMemberReq, inviteMemberResp } from '../../__fixtures__';
-
+import { accessToken, createOrgResp,  organizationId, inviteMemberReq, inviteMemberResp } from '../../__fixtures__';
+import { getHeaders } from '../../utils';
 
 describe('inviteMember', () => {
   let organizationsClient: OrganizationsClient;
@@ -17,7 +17,6 @@ describe('inviteMember', () => {
   });
 
   it('should make a POST request with the required parameters', async () => {
-
     global.fetch = jest.fn().mockResolvedValueOnce({
       ok: true,
       json: jest.fn().mockResolvedValueOnce(inviteMemberResp),
@@ -26,12 +25,12 @@ describe('inviteMember', () => {
     const inviteMember = await organizationsClient.inviteMember(organizationId, {
       ...inviteMemberReq,
     });
-
+    const method = 'POST';
     expect(global.fetch).toHaveBeenCalledWith(
       `${organizationsClient.baseURL}/organizations/${organizationId}/memberships/invite`,
       {
-        method: 'POST',
-        headers: getExpectedHeaders(accessToken),
+        method,
+        headers: getHeaders(accessToken, method),
         body: JSON.stringify(inviteMemberReq),
       }
     );

@@ -1,5 +1,5 @@
 import { version } from '../../package.json';
-import { FetchError, fetchData, getUserAgent } from '../utils';
+import { FetchError, fetchData, getHeaders, getUserAgent, makeQueryString } from "../utils";
 
 jest.mock('node-fetch', () => jest.fn());
 
@@ -30,7 +30,6 @@ describe('fetchData', () => {
       method: 'GET',
       headers: {
         Authorization: `Bearer ${accessToken}`,
-        'Content-Type': 'application/json',
         'User-Agent': getUserAgent(),
       },
     });
@@ -122,5 +121,31 @@ describe('getUserAgent', () => {
     expect(userAgent).toEqual(
       `Uber Direct JS SDK/${version} (Node.js ${process.version})`
     );
+  });
+});
+
+describe("getHeaders", () => {
+  it("should return the correct headers when passed an access token and GET method", () => {
+    const headers = getHeaders("access-token", "GET");
+    expect(headers).toEqual({
+      Authorization: "Bearer access-token",
+      "User-Agent": getUserAgent(),
+    });
+  });
+
+  it("should return the correct headers when passed an access token and POST method", () => {
+    const headers = getHeaders("access-token", "POST");
+    expect(headers).toEqual({
+      Authorization: "Bearer access-token",
+      "Content-Type": "application/json",
+      "User-Agent": getUserAgent(),
+    });
+  });
+});
+
+describe("makeQueryString", () => {
+  it("should return the correct query string when passed an object", () => {
+    const queryString = makeQueryString({ key: "value" });
+    expect(queryString).toEqual("?key=value");
   });
 });

@@ -5,9 +5,9 @@ import {
   accessToken,
   customerId,
   deliveryId,
-  getExpectedHeaders,
   invalidPODReq,
 } from '../../__fixtures__/index';
+import { getHeaders } from '../../utils';
 
 describe('proofOfDelivery', () => {
   let deliveriesClient: DeliveriesClient;
@@ -29,12 +29,12 @@ describe('proofOfDelivery', () => {
     });
 
     const pod = await deliveriesClient.proofOfDelivery(deliveryId, podReq);
-
+    const method = 'POST';
     expect(global.fetch).toHaveBeenCalledWith(
       `${deliveriesClient.baseURL}/deliveries/${deliveryId}/proof-of-delivery`,
       {
-        method: 'POST',
-        headers: getExpectedHeaders(accessToken),
+        method,
+        headers: getHeaders(accessToken, method),
         body: JSON.stringify(podReq),
       }
     );

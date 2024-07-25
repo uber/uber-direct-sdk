@@ -9,16 +9,12 @@ import type {
   PODReq,
   PODResp,
 } from '../deliveries/types';
+import { getUserAgent } from "../utils";
 
 import type { CreateOrgResp, InviteMemberReq, InviteMemberResp } from '../organizations/types';
 
 export const accessToken = 'ACCESS_TOKEN';
 export const customerId = 'CUSTOMER_ID';
-
-export const getExpectedHeaders = (accessToken: string) => ({
-  Authorization: `Bearer ${accessToken}`,
-  'Content-Type': 'application/json',
-});
 
 export const verification = {
   signature_requirement: {

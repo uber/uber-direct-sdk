@@ -5,8 +5,8 @@ import {
   createDeliveryResp,
   accessToken,
   customerId,
-  getExpectedHeaders,
 } from '../../__fixtures__/index';
+import { getHeaders } from "../../utils";
 
 describe('createDelivery', () => {
   let deliveriesClient: DeliveriesClient;
@@ -27,12 +27,12 @@ describe('createDelivery', () => {
     });
 
     const delivery = await deliveriesClient.createDelivery(createDeliveryReq);
-
+    const method = 'POST';
     expect(global.fetch).toHaveBeenCalledWith(
       `${deliveriesClient.baseURL}/deliveries`,
       {
-        method: 'POST',
-        headers: getExpectedHeaders(accessToken),
+        method,
+        headers: getHeaders(accessToken, method),
         body: JSON.stringify(createDeliveryReq),
       }
     );
@@ -48,11 +48,12 @@ describe('createDelivery', () => {
     const req = { ...createDeliveryReq, ...createDeliveryReqOptionalFields };
     const delivery = await deliveriesClient.createDelivery(req);
 
+    const method = 'POST';
     expect(global.fetch).toHaveBeenCalledWith(
       `${deliveriesClient.baseURL}/deliveries`,
       {
-        method: 'POST',
-        headers: getExpectedHeaders(accessToken),
+        method,
+        headers: getHeaders(accessToken, method),
         body: JSON.stringify(req),
       }
     );

@@ -4,8 +4,8 @@ import {
   deliveryId,
   accessToken,
   customerId,
-  getExpectedHeaders,
 } from '../../__fixtures__/index';
+import { getHeaders } from '../../utils';
 
 describe('getDelivery', () => {
   let deliveriesClient: DeliveriesClient;
@@ -27,12 +27,12 @@ describe('getDelivery', () => {
     });
 
     const delivery = await deliveriesClient.getDelivery(deliveryId);
-
+    const method = 'GET';
     expect(global.fetch).toHaveBeenCalledWith(
       `${deliveriesClient.baseURL}/deliveries/${deliveryId}`,
       {
-        method: 'GET',
-        headers: getExpectedHeaders(accessToken),
+        method,
+        headers: getHeaders(accessToken, method),
       }
     );
     expect(delivery).toEqual(createDeliveryResp);
