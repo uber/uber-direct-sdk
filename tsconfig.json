@@ -10,5 +10,11 @@
     "resolveJsonModule": true,
     "outDir": "./dist"
   },
-  "include": ["src/index.ts", "src/auth", "src/deliveries", "src/organizations"]
+  "include": [
+    "src/index.ts",
+    "src/auth",
+    "src/deliveries",
+    "src/organizations"
+  ],
+  "exclude": ["node_modules"]
 }
