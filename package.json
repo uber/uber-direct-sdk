@@ -2,7 +2,8 @@
   "name": "uber-direct",
   "version": "0.1.1",
   "description": "The Uber Direct JS SDK is an npm package that allows developers to easily interact with the Uber Direct API.",
-  "main": "index.js",
+  "main": "dist/index.ts",
+  "types": "dist/index.d.ts",
   "scripts": {
     "prepare": "npm run build",
     "build": "tsc",
