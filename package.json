@@ -1,8 +1,9 @@
 {
   "name": "uber-direct",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "description": "The Uber Direct JS SDK is an npm package that allows developers to easily interact with the Uber Direct API.",
-  "main": "index.js",
+  "main": "dist/index.ts",
+  "types": "dist/index.d.ts",
   "scripts": {
     "prepare": "npm run build",
     "build": "tsc",
@@ -20,11 +21,11 @@
   "author": "Uber",
   "license": "MIT",
   "engines": {
-    "node": "18"
+    "node": ">=18.0.0"
   },
   "devDependencies": {
     "@playwright/test": "^1.41.2",
-    "@types/jest": "^29.4.0",
+    "@types/jest": "^29.5.12",
     "@types/node": "^18.11.18",
     "@types/node-fetch": "^2.6.11",
     "@typescript-eslint/eslint-plugin": "^5.49.0",
@@ -39,7 +40,7 @@
     "jest-coverage-badges": "^1.1.2",
     "jest-fetch-mock": "^3.0.3",
     "prettier": "^2.8.3",
-    "ts-jest": "^29.0.5",
+    "ts-jest": "^29.2.4",
     "typescript": "^4.9.4"
   }
 }
