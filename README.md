@@ -1,6 +1,8 @@
 # Uber Direct JS SDK
 
-![Unit test coverage](./badges/badge-lines.svg)
+_The Uber Direct SDK is currently in beta. We're actively working on improvements and appreciate your patience. If you encounter any bugs or issues, please don't hesitate to create a Github issue in this repo. Your feedback is invaluable as we continue to develop the SDK._
+
+![Unit test coverage](https://github.com/uber/uber-direct-sdk/blob/main/badges/badge-lines.svg)
 
 The Uber Direct Javascript SDK is a zero dependency npm package that allows developers to easily interact with the Uber Direct APIs. The SDK includes three packages:
 
@@ -29,7 +31,8 @@ You can use the `@uber-direct/auth` module to fetch an access token. Please refe
 First, fetch your access token, then create a Deliveries client:
 
 ```js
-import { getAccessToken, createDeliveriesClient } from '@uber-direct';
+import { getAccessToken } from 'uber-direct/auth';
+import { createDeliveriesClient, deliveriesClient } from "uber-direct/deliveries";
 
 const token = await getAccessToken();
 const deliveriesClient = createDeliveriesClient(token);
@@ -203,7 +206,7 @@ To create an Uber Direct developer account, visit [https://direct.uber.com](http
 
 Your app must have the following scopes to access each API:
 
-- DaaS API: `eats.deliveries`
+- Direct API: `eats.deliveries`
 - Organizations API: `direct.organizations`
 
 You should pass in these scopes when requesting an access token (see [Authentication](#authentication) above).
