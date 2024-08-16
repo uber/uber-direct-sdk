@@ -4,7 +4,7 @@ _The Uber Direct SDK is currently in beta. We're actively working on improvement
 
 ![Unit test coverage](https://github.com/uber/uber-direct-sdk/blob/main/badges/badge-lines.svg)
 
-The Uber Direct Javascript SDK is a zero dependency npm package that allows developers to easily interact with the Uber Direct APIs. The SDK includes three packages:
+The Uber Direct Javascript SDK is a zero dependency npm package that allows developers to easily interact with the Uber Direct APIs. The SDK includes three modules:
 
 - `uber-direct/auth` - Enables developers to obtain an access token by providing a client ID, secret, grant type, and a list of scopes.
 - `uber-direct/deliveries` - Enables developers to create and manage deliveries.
@@ -26,7 +26,7 @@ export UBER_DIRECT_CUSTOMER_ID=your_customer_token
 
 ### Authentication & Deliveries Client
 
-You can use the `@uber-direct/auth` module to fetch an access token. Please refer to the [Developer Docs](https://developer.uber.com/docs/deliveries/authentication) for more info.
+You can use the `uber-direct/auth` module to fetch an access token. Please refer to the [Developer Docs](https://developer.uber.com/docs/deliveries/authentication) for more info.
 
 First, fetch your access token, then create a Deliveries client:
 
