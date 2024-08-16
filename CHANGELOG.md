@@ -2,6 +2,10 @@
 
 See https://keepachangelog.com/en/1.0.0/ for best practices.
 
+## v0.1.5 - `2024-08-16`
+
+- Update README
+
 ## v0.1.4 - `2024-08-15`
 
 - Improve exports and README
