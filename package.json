@@ -10,6 +10,9 @@
     "./deliveries": "./dist/src/deliveries/index.js",
     "./organizations": "./dist/src/organizations/index.js"
   },
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "prepare": "npm run build",
     "build": "tsc",
