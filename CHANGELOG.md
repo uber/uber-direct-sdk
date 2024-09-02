@@ -2,9 +2,13 @@
 
 See https://keepachangelog.com/en/1.0.0/ for best practices.
 
+## v0.1.6 - `2024-09-02`
+
+- Update package.json and tsconfig to improve exports
+
 ## v0.1.5 - `2024-08-16`
 
-- Update README:
+- Update README
 
 ## v0.1.4 - `2024-08-15`
 
