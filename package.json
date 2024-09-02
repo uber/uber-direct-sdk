@@ -5,10 +5,10 @@
   "main": "index.js",
   "types": "index.d.ts",
   "exports": {
-    ".": "./src/index.js",
-    "./auth": "./src/auth/index.js",
-    "./deliveries": "./src/deliveries/index.js",
-    "./organizations": "./src/organizations/index.js"
+    ".": "./dist/src/index.js",
+    "./auth": "./dist/src/auth/index.js",
+    "./deliveries": "./dist/src/deliveries/index.js",
+    "./organizations": "./dist/src/organizations/index.js"
   },
   "scripts": {
     "prepare": "npm run build",

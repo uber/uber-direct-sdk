@@ -12,9 +12,9 @@
   },
   "include": [
     "src/index.ts",
-    "src/auth",
-    "src/deliveries",
-    "src/organizations"
+    "src/auth/index.ts",
+    "src/deliveries/index.ts",
+    "src/organizations/index.ts"
   ],
   "exclude": ["node_modules"]
 }
