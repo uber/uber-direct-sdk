@@ -9,7 +9,11 @@ import type {
   PODReq,
   PODResp,
 } from '../deliveries/types';
-import { getUserAgent } from "../utils";
+import type {
+  BillingType,
+  MerchantType,
+  OnboardingInviteType,
+} from "../organizations/types";
 
 import type { CreateOrgResp, InviteMemberReq, InviteMemberResp } from '../organizations/types';
 
@@ -348,3 +352,30 @@ export const podResp: PODResp = {
 export const invalidPODReq: PODReq = {
   waypoint: 'pickup',
 };
+
+export const getCreateOrgReq = (
+  billingType: BillingType = "BILLING_TYPE_CENTRALIZED",
+  merchantType: MerchantType = "MERCHANT_TYPE_RESTAURANT",
+  address: object = {
+    street1: "175 Greenwich Ave",
+    city: "New York",
+    state: "NY",
+    zipcode: "10014",
+    country_iso2: "US",
+  },
+  parentOrganizationId: string = "4fe73ff8-0c9a-5ca3-aa2f-17ef3a8487d5"
+) => ({
+  info: {
+    name: "Test Organization",
+    billing_type: billingType,
+    merchant_type: merchantType,
+    address,
+  },
+  hierarchy_info: {
+    parent_organization_id: parentOrganizationId,
+  },
+  options: {
+    onboarding_invite_type:
+      "ONBOARDING_INVITE_TYPE_EMAIL" as OnboardingInviteType,
+  },
+});

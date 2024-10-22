@@ -1,7 +1,10 @@
-openapi: 3.0.3
+openapi: 3.1.0
 info:
   version: 1.0.1
   title: Organizations API
+  x-logo:
+    url: 'https://personal.uberinternal.com/funcia/logo.jpg'
+    altText: Uber Direct logo
   description: |
     Uber's Organization API enables merchants to create and manage sub-organizations nested below their given root organization.
 
@@ -290,7 +293,11 @@ components:
       properties:
         name:
           type: string
-          description: Business name of the organization.
+          description:  |
+            Business name of the organization.
+
+            **Note:** URLs and the following characters are not allowed:
+            `/`, `\`, `:`, `%`, `<`, `>`, `#`, `=`.
           example: Sample Sub-Org Name
         billing_type:
           type: object
@@ -303,8 +310,11 @@ components:
         point_of_contact:
           type: object
           $ref: '#/components/schemas/PointOfContact'
-          description: Contact details of the orgazniation. Communications related to the organization will be sent here.
-
+          description: Contact details of the organization. Communications related to the organization will be sent here.
+        contract_type:
+          type: string
+          $ref: '#/components/schemas/ContractType'
+          description: Contract type of the organization.
         address:
           type: object
           $ref: '#/components/schemas/Address'
@@ -353,7 +363,10 @@ components:
       properties:
         email:
           type: string
-          description: Primary contact for the organization. This email address will be linked to the Org, giving them admin-level access to the organization.
+          description: |
+            Primary contact for the organization. This email address will be linked to the Org, giving them admin-level access to the organization.
+
+            **Note:** This field is required in case of billing_type: `BILLING_TYPE_DECENTRALIZED`
           example: name@email.com
         phone_details:
           type: string
@@ -386,6 +399,17 @@ components:
       enum:
         - BILLING_TYPE_CENTRALIZED
         - BILLING_TYPE_DECENTRALIZED
+    ContractType:
+      type: string
+      description: |
+        Contract type of the organization.
+        | Type | Description |
+        |--------|--------|
+        | CONTRACT_TYPE_PARENT | Opt-in to the parent organization's contract. |
+        | CONTRACT_TYPE_CUSTOM | Use a custom contract. |
+      enum:
+        - CONTRACT_TYPE_PARENT
+        - CONTRACT_TYPE_CUSTOM
     Address:
       type: object
       description: Billing address, required in the event of a `BILLING_TYPE_DECENTRALIZED` billing_type.
@@ -412,7 +436,10 @@ components:
           example: '92602'
         country_iso2:
           type: string
-          description: 'Country code in 2-char ([ISO 3166 alpha2](https://www.iban.com/country-codes)) format.'
+          description: |
+           Country code in 2-char ([ISO 3166 alpha2](https://www.iban.com/country-codes)) format.
+
+           **Note:** This field is required in case of billing_type: `BILLING_TYPE_DECENTRALIZED`
           example: 'US'
     CreateOrgResp:
       type: object
@@ -458,15 +485,24 @@ components:
       properties:
         email:
           type: string
-          description: E-mail address of the user.
+          description: |
+           E-mail address of the user.
           example: john@email.com
         first_name:
           type: string
-          description: First name of the user.
+          description: |
+            First name of the user.
+
+            **Note:** URLs and the following characters are not allowed:
+            `/`, `\`, `:`, `%`, `<`, `>`, `#`, `=`.
           example: John
         last_name:
           type: string
-          description: Last name of the user.
+          description: |
+            Last name of the user.
+
+            **Note:** URLs and the following characters are not allowed:
+            `/`, `\`, `:`, `%`, `<`, `>`, `#`, `=`.
           example: Smith
         phone_details:
           type: object
@@ -549,7 +585,8 @@ paths:
         - The created organizations will use the same integration credentials as the Direct Account (client_id and client_secret) for authentication.
         - After a new Org is created, it will be uniquely identified by it's `organization_id` which translates to the `customer_id` parameter in future API requests. Use this UUID in the API requests to create and manage deliveries at the respective Org-level.
             Example: CreateQuote:  _https://api.uber.com/v1/customers/{customer_id}/deliveries_ replace the `{customer_id}` with the UUID created for the Org.
-        - If you need to update the Org information after it is created, please contact your Uber business contact.
+        - Sub-organizations should be created on an as-needed basis as they can only be deleted manually by the Uber team.
+        - If you need to update Org information or delete the Org, please reach out to your Uber business contact.
       requestBody:
         content:
           application/json:
