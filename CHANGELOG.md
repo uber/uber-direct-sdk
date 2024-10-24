@@ -2,6 +2,14 @@
 
 See https://keepachangelog.com/en/1.0.0/ for best practices.
 
+## v0.1.8 - `2024-10-24`
+
+- Update organization.yaml to add `contract_type` field
+
+## v0.1.7 - `2024-09-02`
+
+- Update package.json and tsconfig to improve exports
+
 ## v0.1.6 - `2024-09-02`
 
 - Update package.json and tsconfig to improve exports
