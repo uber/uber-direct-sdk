@@ -2,6 +2,10 @@
 
 See https://keepachangelog.com/en/1.0.0/ for best practices.
 
+## v0.1.9 - `2024-10-24`
+
+- Add contract type to Create Organization
+
 ## v0.1.6 - `2024-09-02`
 
 - Update package.json and tsconfig to improve exports
