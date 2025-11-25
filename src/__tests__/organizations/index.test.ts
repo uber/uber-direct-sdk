@@ -21,7 +21,7 @@ describe('OrganizationsClient', () => {
     });
 
     expect(organizationsClient).toBeDefined();
-    expect(organizationsClient.baseURL).toEqual('https://api-sandbox.uber.com/v1/direct');
+    expect(organizationsClient.baseURL).toEqual('https://sandbox-api.uber.com/v1/direct');
   });
 
   it('success - should use production URL when environment is set to production', () => {

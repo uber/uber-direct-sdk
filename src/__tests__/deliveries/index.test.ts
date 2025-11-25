@@ -37,7 +37,7 @@ describe('DeliveriesClient', () => {
 
     expect(deliveriesClient).toBeDefined();
     expect(deliveriesClient.baseURL).toEqual(
-      `https://api-sandbox.uber.com/v1/customers/${customerId}`
+      `https://sandbox-api.uber.com/v1/customers/${customerId}`
     );
   });
 

@@ -11,6 +11,6 @@ export interface ClientOptions {
 
 export const getBaseURL = (environment: Environment = 'production'): string => {
   return environment === 'sandbox'
-    ? 'https://api-sandbox.uber.com'
+    ? 'https://sandbox-api.uber.com'
     : 'https://api.uber.com';
 };
