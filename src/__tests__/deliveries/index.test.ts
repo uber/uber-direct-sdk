@@ -19,11 +19,34 @@ describe('DeliveriesClient', () => {
   });
 
   it('success - should return an instance of DeliveriesClient if customerID is passed in', () => {
-    const deliveriesClient = createDeliveriesClient(accessToken, customerId);
+    const deliveriesClient = createDeliveriesClient(accessToken, { customerID: customerId });
 
     expect(deliveriesClient).toBeDefined();
     expect(deliveriesClient.accessToken).toEqual(accessToken);
     expect(deliveriesClient.customerID).toEqual(customerId);
+    expect(deliveriesClient.baseURL).toEqual(
+      `https://api.uber.com/v1/customers/${customerId}`
+    );
+  });
+
+  it('success - should use sandbox URL when environment is set to sandbox', () => {
+    const deliveriesClient = createDeliveriesClient(accessToken, {
+      customerID: customerId,
+      environment: 'sandbox'
+    });
+
+    expect(deliveriesClient).toBeDefined();
+    expect(deliveriesClient.baseURL).toEqual(
+      `https://api-sandbox.uber.com/v1/customers/${customerId}`
+    );
+  });
+
+  it('success - should use production URL by default', () => {
+    const deliveriesClient = createDeliveriesClient(accessToken, {
+      customerID: customerId
+    });
+
+    expect(deliveriesClient).toBeDefined();
     expect(deliveriesClient.baseURL).toEqual(
       `https://api.uber.com/v1/customers/${customerId}`
     );
