@@ -8,23 +8,15 @@ import type {
 import { fetchData, makeQueryString } from '../utils';
 import { getBaseURL, type ClientOptions } from '../config';
 
-export interface DeliveriesClientOptions extends ClientOptions {
-  /**
-   * The Uber Direct customer ID. If not provided, falls back to
-   * the UBER_DIRECT_CUSTOMER_ID environment variable.
-   */
-  customerId?: string;
-}
-
 export class DeliveriesClient {
   accessToken: string;
   baseURL: string;
   customerID: string;
 
-  constructor(accessToken: string, options?: DeliveriesClientOptions) {
+  constructor(accessToken: string, customerId?: string, options?: ClientOptions) {
     this.accessToken = accessToken;
 
-    const cusID = options?.customerId || process.env.UBER_DIRECT_CUSTOMER_ID;
+    const cusID = customerId || process.env.UBER_DIRECT_CUSTOMER_ID;
 
     if (!cusID) {
       throw new Error(
@@ -99,7 +91,8 @@ export class DeliveriesClient {
 
 export const createDeliveriesClient = (
   accessToken: string,
-  options?: DeliveriesClientOptions
+  customerId?: string,
+  options?: ClientOptions
 ) => {
-  return new DeliveriesClient(accessToken, options);
+  return new DeliveriesClient(accessToken, customerId, options);
 };
