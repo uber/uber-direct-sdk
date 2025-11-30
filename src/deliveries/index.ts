@@ -6,16 +6,17 @@ import type {
   UpdateDeliveryReq,
 } from './types';
 import { fetchData, makeQueryString } from '../utils';
+import { getBaseURL, type ClientOptions } from '../config';
 
 export class DeliveriesClient {
   accessToken: string;
   baseURL: string;
   customerID: string;
 
-  constructor(accessToken: string, customerID?: string) {
+  constructor(accessToken: string, customerId?: string, options?: ClientOptions) {
     this.accessToken = accessToken;
 
-    const cusID = customerID || process.env.UBER_DIRECT_CUSTOMER_ID;
+    const cusID = customerId || process.env.UBER_DIRECT_CUSTOMER_ID;
 
     if (!cusID) {
       throw new Error(
@@ -23,7 +24,8 @@ export class DeliveriesClient {
       );
     }
     this.customerID = cusID;
-    this.baseURL = `https://api.uber.com/v1/customers/${this.customerID}`;
+    const baseURL = getBaseURL(options?.environment);
+    this.baseURL = `${baseURL}/v1/customers/${this.customerID}`;
   }
 
   async createQuote(req: DeliveryQuoteReq) {
@@ -89,7 +91,8 @@ export class DeliveriesClient {
 
 export const createDeliveriesClient = (
   accessToken: string,
-  customerID?: string
+  customerId?: string,
+  options?: ClientOptions
 ) => {
-  return new DeliveriesClient(accessToken, customerID);
+  return new DeliveriesClient(accessToken, customerId, options);
 };

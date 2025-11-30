@@ -28,4 +28,24 @@ describe('DeliveriesClient', () => {
       `https://api.uber.com/v1/customers/${customerId}`
     );
   });
+
+  it('success - should use sandbox URL when environment is set to sandbox', () => {
+    const deliveriesClient = createDeliveriesClient(accessToken, customerId, {
+      environment: 'sandbox'
+    });
+
+    expect(deliveriesClient).toBeDefined();
+    expect(deliveriesClient.baseURL).toEqual(
+      `https://sandbox-api.uber.com/v1/customers/${customerId}`
+    );
+  });
+
+  it('success - should use production URL by default', () => {
+    const deliveriesClient = createDeliveriesClient(accessToken, customerId);
+
+    expect(deliveriesClient).toBeDefined();
+    expect(deliveriesClient.baseURL).toEqual(
+      `https://api.uber.com/v1/customers/${customerId}`
+    );
+  });
 });

@@ -1,14 +1,16 @@
 import type { CreateOrgReq } from './types';
 import type { InviteMemberReq } from './types';
 import { fetchData } from '../utils';
+import { getBaseURL, type ClientOptions } from '../config';
 
 export class OrganizationsClient {
   accessToken: string;
   baseURL: string;
 
-  constructor(accessToken: string) {
+  constructor(accessToken: string, options?: ClientOptions) {
     this.accessToken = accessToken;
-    this.baseURL = 'https://api.uber.com/v1/direct';
+    const baseURL = getBaseURL(options?.environment);
+    this.baseURL = `${baseURL}/v1/direct`;
   }
 
   async createOrganization(req: CreateOrgReq) {
@@ -26,6 +28,9 @@ export class OrganizationsClient {
 
 }
 
-export const createOrganizationsClient = (accessToken: string) => {
-  return new OrganizationsClient(accessToken);
+export const createOrganizationsClient = (
+  accessToken: string,
+  options?: ClientOptions
+) => {
+  return new OrganizationsClient(accessToken, options);
 };
