@@ -13,7 +13,7 @@ export interface DeliveriesClientOptions extends ClientOptions {
    * The Uber Direct customer ID. If not provided, falls back to
    * the UBER_DIRECT_CUSTOMER_ID environment variable.
    */
-  customerID?: string;
+  customerId?: string;
 }
 
 export class DeliveriesClient {
@@ -24,7 +24,7 @@ export class DeliveriesClient {
   constructor(accessToken: string, options?: DeliveriesClientOptions) {
     this.accessToken = accessToken;
 
-    const cusID = options?.customerID || process.env.UBER_DIRECT_CUSTOMER_ID;
+    const cusID = options?.customerId || process.env.UBER_DIRECT_CUSTOMER_ID;
 
     if (!cusID) {
       throw new Error(

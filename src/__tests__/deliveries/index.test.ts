@@ -19,7 +19,7 @@ describe('DeliveriesClient', () => {
   });
 
   it('success - should return an instance of DeliveriesClient if customerID is passed in', () => {
-    const deliveriesClient = createDeliveriesClient(accessToken, { customerID: customerId });
+    const deliveriesClient = createDeliveriesClient(accessToken, { customerId });
 
     expect(deliveriesClient).toBeDefined();
     expect(deliveriesClient.accessToken).toEqual(accessToken);
@@ -31,7 +31,7 @@ describe('DeliveriesClient', () => {
 
   it('success - should use sandbox URL when environment is set to sandbox', () => {
     const deliveriesClient = createDeliveriesClient(accessToken, {
-      customerID: customerId,
+      customerId,
       environment: 'sandbox'
     });
 
@@ -43,7 +43,7 @@ describe('DeliveriesClient', () => {
 
   it('success - should use production URL by default', () => {
     const deliveriesClient = createDeliveriesClient(accessToken, {
-      customerID: customerId
+      customerId
     });
 
     expect(deliveriesClient).toBeDefined();
