@@ -40,6 +40,34 @@ const deliveriesClient = createDeliveriesClient(token);
 
 You can use this client for subsequent requests.
 
+### Using Sandbox Environment
+
+Both the Organizations and Deliveries clients support connecting to the Uber sandbox environment for testing purposes. By default, clients connect to the production API (`api.uber.com`). You can specify the sandbox environment by passing options to the client constructors:
+
+#### Deliveries Client with Sandbox
+
+```js
+import { getAccessToken } from 'uber-direct/auth';
+import { createDeliveriesClient } from 'uber-direct/deliveries';
+
+const token = await getAccessToken();
+const deliveriesClient = createDeliveriesClient(token, customerId, {
+  environment: 'sandbox'
+});
+```
+
+#### Organizations Client with Sandbox
+
+```js
+import { getAccessToken } from 'uber-direct/auth';
+import { createOrganizationsClient } from 'uber-direct/organizations';
+
+const token = await getAccessToken();
+const organizationsClient = createOrganizationsClient(token, {
+  environment: 'sandbox'
+});
+```
+
 #### Create Quote
 
 ```js
