@@ -14,7 +14,8 @@
     "src/index.ts",
     "src/auth/index.ts",
     "src/deliveries/index.ts",
-    "src/organizations/index.ts"
+    "src/organizations/index.ts",
+    "src/types/index.ts"
   ],
   "exclude": ["node_modules"]
 }

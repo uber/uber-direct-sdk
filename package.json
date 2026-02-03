@@ -8,14 +8,16 @@
     ".": "./dist/src/index.js",
     "./auth": "./dist/src/auth/index.js",
     "./deliveries": "./dist/src/deliveries/index.js",
-    "./organizations": "./dist/src/organizations/index.js"
+    "./organizations": "./dist/src/organizations/index.js",
+    "./types": "./dist/src/types/index.js"
   },
   "files": [
     "dist"
   ],
   "scripts": {
     "prepare": "npm run build",
-    "build": "tsc",
+  "build": "tsc && npm run copy:types",
+  "copy:types": "node ./scripts/copyTypes.js",
     "lint": "eslint . --ext .ts",
     "types": "./scripts/generateTypes.sh",
     "test": "jest --coverage",

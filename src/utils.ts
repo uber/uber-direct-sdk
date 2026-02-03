@@ -58,12 +58,12 @@ const makeQueryString = (params: Record<string, unknown>) => {
   return `?${query}`;
 };
 
-const fetchData = async <T = any>(
+const fetchData = async <T>(
   url: string,
   method: 'GET' | 'POST',
   accessToken: string,
   req?: Record<string, unknown>
-) => {
+): Promise<T> => {
   const headers: Record<string, string> = getHeaders(accessToken, method);
 
   const options: RequestInit = {
@@ -76,7 +76,7 @@ const fetchData = async <T = any>(
     const response = await fetch(url, options);
     if (response.ok) {
       const data = await response.json();
-      return data;
+      return data as T;
     } else {
       const errorResponse: ApiError = await response.json();
       throw new FetchError(

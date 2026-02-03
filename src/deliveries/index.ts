@@ -1,8 +1,13 @@
 import type {
+  CreateDeliveryResp,
   DeliveryQuoteReq,
+  DeliveryQuoteResp,
   DeliveryReq,
+  DeliveryResp,
   ListDeliveriesReq,
+  ListDeliveriesResp,
   PODReq,
+  PODResp,
   UpdateDeliveryReq,
 } from './types';
 import { fetchData, makeQueryString } from '../utils';
@@ -27,7 +32,7 @@ export class DeliveriesClient {
   }
 
   async createQuote(req: DeliveryQuoteReq) {
-    return fetchData(
+    return fetchData<DeliveryQuoteResp>(
       `${this.baseURL}/delivery_quotes`,
       'POST',
       this.accessToken,
@@ -36,7 +41,7 @@ export class DeliveriesClient {
   }
 
   async createDelivery(req: DeliveryReq) {
-    return fetchData(
+    return fetchData<CreateDeliveryResp>(
       `${this.baseURL}/deliveries`,
       'POST',
       this.accessToken,
@@ -45,7 +50,7 @@ export class DeliveriesClient {
   }
 
   async getDelivery(deliveryId: string) {
-    return fetchData(
+    return fetchData<DeliveryResp>(
       `${this.baseURL}/deliveries/${deliveryId}`,
       'GET',
       this.accessToken
@@ -57,11 +62,11 @@ export class DeliveriesClient {
     if (options) {
       url += makeQueryString(options);
     }
-    return fetchData(url, 'GET', this.accessToken);
+    return fetchData<ListDeliveriesResp>(url, 'GET', this.accessToken);
   }
 
   async cancelDelivery(deliveryId: string) {
-    return fetchData(
+    return fetchData<DeliveryResp>(
       `${this.baseURL}/deliveries/${deliveryId}/cancel`,
       'POST',
       this.accessToken
@@ -69,7 +74,7 @@ export class DeliveriesClient {
   }
 
   async updateDelivery(deliveryId: string, req: UpdateDeliveryReq) {
-    return fetchData(
+    return fetchData<DeliveryResp>(
       `${this.baseURL}/deliveries/${deliveryId}`,
       'POST',
       this.accessToken,
@@ -78,7 +83,7 @@ export class DeliveriesClient {
   }
 
   async proofOfDelivery(deliveryId: string, req: PODReq) {
-    return fetchData(
+    return fetchData<PODResp>(
       `${this.baseURL}/deliveries/${deliveryId}/proof-of-delivery`,
       'POST',
       this.accessToken,

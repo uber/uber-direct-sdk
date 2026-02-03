@@ -27,7 +27,10 @@ export async function getAccessToken(): Promise<string> {
 
     if (response.ok) {
       const data: LoginResp = await response.json();
-      return data.access_token as string;
+      if (!data.access_token) {
+        throw new Error('Access token is missing in response');
+      }
+      return data.access_token;
     } else {
       const error = await response.text();
       throw new Error(`Failed to fetch access token: ${error}`);
