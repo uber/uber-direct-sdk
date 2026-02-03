@@ -16,8 +16,8 @@
   ],
   "scripts": {
     "prepare": "npm run build",
-  "build": "tsc && npm run copy:types",
-  "copy:types": "node ./scripts/copyTypes.js",
+    "build": "tsc && npm run copy:types",
+    "copy:types": "node ./scripts/copyTypes.js",
     "lint": "eslint . --ext .ts",
     "types": "./scripts/generateTypes.sh",
     "test": "jest --coverage",
