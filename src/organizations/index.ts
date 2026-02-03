@@ -1,5 +1,4 @@
-import type { CreateOrgReq } from './types';
-import type { InviteMemberReq } from './types';
+import type { CreateOrgResp, CreateOrgReq,InviteMemberResp, InviteMemberReq } from './types';
 import { fetchData } from '../utils';
 
 export class OrganizationsClient {
@@ -12,15 +11,15 @@ export class OrganizationsClient {
   }
 
   async createOrganization(req: CreateOrgReq) {
-    return fetchData(`${this.baseURL}/organizations`, 'POST', this.accessToken, req);
+    return fetchData<CreateOrgResp>(`${this.baseURL}/organizations`, 'POST', this.accessToken, req);
   }
 
   async inviteMember(organizationId: string, req: InviteMemberReq) {
-    return fetchData(`${this.baseURL}/organizations/${organizationId}/memberships/invite`, 'POST', this.accessToken, req);
+    return fetchData<InviteMemberResp>(`${this.baseURL}/organizations/${organizationId}/memberships/invite`, 'POST', this.accessToken, req);
   }
 
   async getOrganization(organizationId: string) {
-    return fetchData(`${this.baseURL}/organizations/${organizationId}`, 'GET', this.accessToken);
+    return fetchData<CreateOrgResp>(`${this.baseURL}/organizations/${organizationId}`, 'GET', this.accessToken);
   }
 
 

@@ -16,6 +16,7 @@ type DeliveryQuoteReq = components['schemas']['DeliveryQuoteReq'];
 type DeliveryQuoteResp = components['schemas']['DeliveryQuoteResp'];
 type DeliveryReq = components['schemas']['DeliveryReq'];
 type DeliveryResp = components['schemas']['DeliveryResp'];
+type CreateDeliveryResp = components['schemas']['CreateDeliveryResp'];
 type UpdateDeliveryReq = components['schemas']['UpdateDeliveryReq'];
 type ListDeliveriesReq = paths['/customers/{customer_id}/deliveries']['get']['parameters']['query'];
 type ListDeliveriesResp =
@@ -28,6 +29,7 @@ export type {
   DeliveryQuoteResp,
   DeliveryReq,
   DeliveryResp,
+  CreateDeliveryResp,
   Error,
   ListDeliveriesReq,
   ListDeliveriesResp,
